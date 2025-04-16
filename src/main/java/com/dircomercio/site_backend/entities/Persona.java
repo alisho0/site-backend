@@ -1,10 +1,15 @@
 package com.dircomercio.site_backend.entities;
 
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,4 +38,11 @@ public class Persona {
     private String tipoDocumento;
     private String domicilio;
     private String wpp;
+
+    @ManyToMany(mappedBy = "personas")
+    @JoinTable(
+    name = "denuncia_persona", 
+    joinColumns = @JoinColumn(name = "persona_id"), 
+    inverseJoinColumns = @JoinColumn(name = "denuncia_id"))
+    private List<Denuncia> denuncias;
 }
