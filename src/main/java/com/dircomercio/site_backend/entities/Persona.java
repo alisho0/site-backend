@@ -39,10 +39,6 @@ public class Persona {
     private String domicilio;
     private String wpp;
 
-    @ManyToMany(mappedBy = "personas")
-    @JoinTable(
-    name = "denuncia_persona", 
-    joinColumns = @JoinColumn(name = "persona_id"), 
-    inverseJoinColumns = @JoinColumn(name = "denuncia_id"))
+    @ManyToMany(mappedBy = "personas") // Hace referencia a la lista de la otra clase
     private List<Denuncia> denuncias;
 }
