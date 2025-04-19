@@ -6,4 +6,5 @@ import com.dircomercio.site_backend.entities.Persona;
 
 public interface PersonaRepository extends CrudRepository<Persona, Long> {
     
+
 }
