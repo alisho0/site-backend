@@ -11,13 +11,11 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Entity
 @Table(name = "audiencia")
-
-
 public class Audiencia {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
-    private Long idAudiencia;
+    private Long id;
+    
     private LocalDate fecha;
     private String hora;
     private String lugar;
