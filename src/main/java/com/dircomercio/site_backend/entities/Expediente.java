@@ -1,11 +1,11 @@
 package com.dircomercio.site_backend.entities;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,24 +16,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "personas")
+@Table(name = "expedientes")
 @Builder
-public class Persona {
-
+public class Expediente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String nombre;
-    private String apellido;
-    private String email;
-    private String telefono;
-    @Column(name = "codigo_postal")
-    private String cp;
-    private String localidad;
-    private String documento;
-    private String tipoDocumento;
-    private String domicilio;
-    private String wpp;
-    @OneToOne(mappedBy = "persona")
+    private String nro_exp;
+    private String cant_folios;
+    private String fecha_inicio;
+    private String fecha_finalizacion;
+    private String hipervulnerable;
+    private String delegacion;
+
+    @ManyToOne
+    @JoinColumn(name = "id_usuario", referencedColumnName = "id")
     private Usuario usuario;
 }
