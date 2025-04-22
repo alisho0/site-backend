@@ -20,4 +20,7 @@ public class Audiencia {
     private String hora;
     private String lugar;
 
+    @ManyToOne
+    @JoinColumn(name = "denuncia_id", nullable = false)
+    private Persona persona;
 }

@@ -7,11 +7,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-<<<<<<< HEAD
 import jakarta.persistence.OneToOne;
-=======
 import jakarta.persistence.ManyToMany;
->>>>>>> 119c5ee50ad395c6dce105183eaab17c2f5b3bb7
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,9 +38,13 @@ public class Persona {
     private String tipoDocumento;
     private String domicilio;
     private String wpp;
-    @OneToOne(mappedBy = "persona")
-    private Usuario usuario;
+
+    // @OneToOne(mappedBy = "persona")
+    // private Usuario usuario;
 
     @ManyToMany(mappedBy = "personas") // Hace referencia a la lista de la otra clase
     private List<Denuncia> denuncias;
+
+    @OneToMany(mappedBy = "persona")
+    private List<Audiencia> audiencias;
 }
