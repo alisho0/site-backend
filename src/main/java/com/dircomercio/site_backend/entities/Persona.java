@@ -7,11 +7,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-<<<<<<< HEAD
 import jakarta.persistence.OneToOne;
-=======
 import jakarta.persistence.ManyToMany;
->>>>>>> 119c5ee50ad395c6dce105183eaab17c2f5b3bb7
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
