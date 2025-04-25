@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,9 +38,13 @@ public class Persona {
     private String tipoDocumento;
     private String domicilio;
     private String wpp;
-    @OneToOne(mappedBy = "persona")
-    private Usuario usuario;
+
+    // @OneToOne(mappedBy = "persona")
+    // private Usuario usuario;
 
     @ManyToMany(mappedBy = "personas") // Hace referencia a la lista de la otra clase
     private List<Denuncia> denuncias;
+
+    @OneToMany(mappedBy = "persona")
+    private List<Audiencia> audiencias;
 }
