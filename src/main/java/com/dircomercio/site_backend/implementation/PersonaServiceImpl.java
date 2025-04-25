@@ -1,13 +1,16 @@
 package com.dircomercio.site_backend.implementation;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dircomercio.site_backend.entities.Denuncia;
 import com.dircomercio.site_backend.entities.Persona;
+import com.dircomercio.site_backend.repositories.DenunciaRepository;
 import com.dircomercio.site_backend.repositories.PersonaRepository;
 import com.dircomercio.site_backend.services.PersonaService;
 
@@ -16,6 +19,9 @@ public class PersonaServiceImpl implements PersonaService {
 
     @Autowired
     PersonaRepository personaRepository;
+
+    @Autowired
+    DenunciaRepository denunciaRepository;
 
     @Override
     public void guardarPersonas(List<Persona> personas, Denuncia denuncia) {
@@ -31,6 +37,28 @@ public class PersonaServiceImpl implements PersonaService {
 
         personaRepository.saveAll(listaPersonas);
 
+    }
+
+    @Override
+    public Optional<Persona> buscarPersonaPorId(Long id) {
+        return personaRepository.findById(id);
+    } 
+
+    @Override
+    public List<Persona> buscarPersonasPorDenuncia(Long idDenuncia) {
+        return denunciaRepository.findById(idDenuncia)
+                .map(Denuncia::getPersonas)
+                .orElse(Collections.emptyList());
+    }
+
+    @Override
+    public List<Persona> listarPersonas() {
+        return (List<Persona>) personaRepository.findAll();
+    }
+
+    @Override
+    public Optional<Persona> buscarPorDni(String tipoDocumento, String numeroDocumento) {
+        return personaRepository.findByDocumento(tipoDocumento, numeroDocumento);
     }
 
 }

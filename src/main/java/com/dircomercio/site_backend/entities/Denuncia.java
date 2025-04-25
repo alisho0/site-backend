@@ -1,5 +1,6 @@
 package com.dircomercio.site_backend.entities;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import jakarta.persistence.Entity;
@@ -29,6 +30,7 @@ public class Denuncia {
     private List<String> objeto;
     private List<String> motivo;
     private String estado;
+    private LocalDate fecha; // Lo creo momentaneamente para testear
 
     @ManyToMany
     @JoinTable(name = "denuncia_persona", // Nombre de la tabla intermedia 
