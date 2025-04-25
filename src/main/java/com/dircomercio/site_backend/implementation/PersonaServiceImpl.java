@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.dircomercio.site_backend.entities.Denuncia;
 import com.dircomercio.site_backend.entities.Persona;
 import com.dircomercio.site_backend.repositories.PersonaRepository;
 import com.dircomercio.site_backend.services.PersonaService;
 
+@Service
 public class PersonaServiceImpl implements PersonaService {
 
     @Autowired
