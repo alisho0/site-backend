@@ -1,26 +1,59 @@
 package com.dircomercio.site_backend.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "audiencia")
+
 public class Audiencia {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    private LocalDate fecha;
+    private LocalDateTime fecha;
     private String hora;
     private String lugar;
+    private String persona;
 
-    @ManyToOne
-    @JoinColumn(name = "denuncia_id", nullable = false)
-    private Persona persona;
+    public Audiencia(){
+
+    }
+    public Long getId(){
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public LocalDateTime getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(LocalDateTime fecha) {
+        this.fecha = fecha;
+    }
+
+    public String getLugar() {
+        return lugar;
+    }
+
+    public void setLugar(String lugar) {
+        this.lugar = lugar;
+    }
+    public String getHora() {
+        return hora;
+    }
+
+    public void setHora(String hora) {
+        this.hora = hora;
+    }
+
+    public String getPersona() {
+        return persona;
+    }
+
+    public void setPersona(String persona) {
+        this.persona = persona;
+    }
 }
