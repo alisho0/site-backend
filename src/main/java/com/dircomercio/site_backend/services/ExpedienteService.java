@@ -1,46 +1,18 @@
 package com.dircomercio.site_backend.services;
 
-import com.dircomercio.site_backend.models.Expediente;
-import com.dircomercio.site_backend.repositories.ExpedienteRepository;
-import com.dircomercio.site_backend.services.ExpedienteService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.dircomercio.site_backend.entities.Expediente;
 
 import java.util.List;
-import java.util.Optional;
 
-@Service
-public class ExpedienteService implements ExpedienteService {
+public interface ExpedienteService {
 
-    @Autowired
-    private ExpedienteRepository expedienteRepository;
+    Expediente crearExpediente(Expediente expediente);
 
-    @Override
-    public Expedient crearExpediente(Expediente expediente) {
-        return expedienteRepository.save(expediente);
-    }
+    Expediente obtenerExpedientePorId(Long id);
 
-    @Override
-    public Expediente obtenerExpedientePorId(Long id) {
-        Optional<Expediente> expediente = expedienteRepository.findById(id);
-        return expediente.orElseThrow(() -> new RuntimeException("Expediente no encontrado"));
-    }
+    List<Expediente> listarExpedientes();
 
-    @Override
-    public List<Expediente> listarExpedientes() {
-        return expedienteRepository.findAll();
-    }
+    Expediente actualizarExpediente(Long id, Expediente expediente);
 
-    @Override
-    public Expediente actualizarExpediente(Long id, Expediente expediente) {
-        Expediente existente = obtenerExpedientePorId(id);
-        existente.setNombre(expediente.getNombre()); // Ejemplo de campo
-        existente.setDescripcion(expediente.getDescripcion()); // Ejemplo de campo
-        return expedienteRepository.save(existente);
-    }
-
-    @Override
-    public void eliminarExpediente(Long id) {
-        expedienteRepository.deleteById(id);
-    }
+    void eliminarExpediente(Long id);
 }

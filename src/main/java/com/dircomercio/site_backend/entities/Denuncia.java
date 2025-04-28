@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -39,4 +40,8 @@ public class Denuncia {
     
     @OneToMany(mappedBy = "denuncia")
     private List<Documento> documentos;
+
+    @OneToOne
+    @JoinColumn(name = "expediente_id", referencedColumnName = "id", nullable = true)
+    private Expediente expediente;
 }

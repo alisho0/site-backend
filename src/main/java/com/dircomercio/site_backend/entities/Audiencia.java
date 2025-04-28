@@ -1,11 +1,18 @@
 package com.dircomercio.site_backend.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "audiencia")
-
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Audiencia {
     
     @Id
@@ -16,44 +23,14 @@ public class Audiencia {
     private String lugar;
     private String persona;
 
-    public Audiencia(){
+    @ManyToOne
+    @JoinColumn(name = "id_expediente")
+    private Expediente expediente;
 
-    }
-    public Long getId(){
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public LocalDateTime getFecha() {
-        return fecha;
-    }
-
-    public void setFecha(LocalDateTime fecha) {
-        this.fecha = fecha;
-    }
-
-    public String getLugar() {
-        return lugar;
-    }
-
-    public void setLugar(String lugar) {
-        this.lugar = lugar;
-    }
-    public String getHora() {
-        return hora;
-    }
-
-    public void setHora(String hora) {
-        this.hora = hora;
-    }
-
-    public String getPersona() {
-        return persona;
-    }
-
-    public void setPersona(String persona) {
-        this.persona = persona;
-    }
+    @ManyToMany
+    @JoinTable(name = "audiencia_persona",
+    joinColumns = @JoinColumn(name = "audiencia_id"),
+    inverseJoinColumns = @JoinColumn(name = "persona_id")
+    )
+    private List<Persona> personas;
 }
