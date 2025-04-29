@@ -12,9 +12,9 @@ import java.util.List;
 @RequestMapping("/api/audiencias")
 public class AudienciaController {
 
+    @Autowired
     private final AudienciaService audienciaService;
 
-    @Autowired
     public AudienciaController(AudienciaService audienciaService) {
         this.audienciaService = audienciaService;
     }

@@ -9,5 +9,5 @@ import com.dircomercio.site_backend.entities.Documento;
 
 public interface DocumentoService {
 
-    List<Documento> guardarDocumentos(List<MultipartFile> files) throws Exception;
+    List<Documento> guardarDocumentos(List<MultipartFile> files, Denuncia denuncia) throws Exception;
 }
