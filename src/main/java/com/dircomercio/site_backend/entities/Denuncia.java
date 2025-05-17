@@ -2,6 +2,8 @@ package com.dircomercio.site_backend.entities;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,7 +29,9 @@ public class Denuncia {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String descripcion;
+    @JsonProperty("objeto")
     private List<String> objeto;
+    @JsonProperty("motivo")
     private List<String> motivo;
     private String estado;
 
