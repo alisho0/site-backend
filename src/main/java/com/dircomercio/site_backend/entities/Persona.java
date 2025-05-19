@@ -44,6 +44,6 @@ public class Persona {
     @ManyToMany(mappedBy = "personas") // Hace referencia a la lista de la otra clase
     private List<Denuncia> denuncias;
 
-    @OneToMany(mappedBy = "persona")
+    @ManyToMany(mappedBy = "personas")
     private List<Audiencia> audiencias;
 }

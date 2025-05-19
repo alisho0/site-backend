@@ -4,23 +4,33 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.time.LocalDate;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Entity
+@Table(name = "audiencia")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "audiencia")
 public class Audiencia {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    private LocalDate fecha;
+    private LocalDateTime fecha;
     private String hora;
     private String lugar;
+    private String persona;
 
     @ManyToOne
-    @JoinColumn(name = "denuncia_id", nullable = false)
-    private Persona persona;
+    @JoinColumn(name = "id_expediente")
+    private Expediente expediente;
+
+    @ManyToMany
+    @JoinTable(name = "audiencia_persona",
+    joinColumns = @JoinColumn(name = "audiencia_id"),
+    inverseJoinColumns = @JoinColumn(name = "persona_id")
+    )
+    private List<Persona> personas;
 }

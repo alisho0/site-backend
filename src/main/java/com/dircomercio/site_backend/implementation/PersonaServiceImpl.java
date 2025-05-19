@@ -61,4 +61,10 @@ public class PersonaServiceImpl implements PersonaService {
         return personaRepository.findByDocumento(tipoDocumento, numeroDocumento);
     }
 
+    @Override
+    public void modificarPersona(Long id, Persona persona) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'modificarPersona'");
+    }
+
 }

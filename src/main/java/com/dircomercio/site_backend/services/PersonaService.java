@@ -19,4 +19,6 @@ public interface PersonaService {
     Optional<Persona> buscarPorDni(String tipoDocumento, String numeroDocumento);
 
     //Persona actualizarContacto(Long id, Persona nuevosDatos); PARA REVISAR
+
+    void modificarPersona(Long id, Persona persona);
 }
