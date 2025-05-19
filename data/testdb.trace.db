@@ -1,0 +1,9 @@
+2025-05-17 15:31:45.072372-03:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PERSONAS" not found (this database is empty); SQL statement:
+insert into personas (apellido,codigo_postal,documento,domicilio,email,localidad,nombre,telefono,tipo_documento,wpp,id) values (?,?,?,?,?,?,?,?,?,?,default) [42104-232]
+2025-05-17 15:33:30.231927-03:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PERSONAS" not found (this database is empty); SQL statement:
+insert into personas (apellido,codigo_postal,documento,domicilio,email,localidad,nombre,telefono,tipo_documento,wpp,id) values (?,?,?,?,?,?,?,?,?,?,default) [42104-232]
+2025-05-17 15:35:35.895770-03:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "PERSONAS" not found (this database is empty); SQL statement:
+insert into personas (apellido,codigo_postal,documento,domicilio,email,localidad,nombre,telefono,tipo_documento,wpp,id) values (?,?,?,?,?,?,?,?,?,?,default) [42104-232]

@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.dircomercio.site_backend.entities.Denuncia;
+import com.dircomercio.site_backend.dtos.PersonaRolDTO;
 import com.dircomercio.site_backend.entities.Persona;
 import com.dircomercio.site_backend.repositories.PersonaRepository;
 import com.dircomercio.site_backend.services.PersonaService;
@@ -18,18 +18,23 @@ public class PersonaServiceImpl implements PersonaService {
     PersonaRepository personaRepository;
 
     @Override
-    public void guardarPersonas(List<Persona> personas, Denuncia denuncia) {
+    public List<Persona> guardarPersonas(List<PersonaRolDTO> personas) {
         List<Persona> listaPersonas = new ArrayList<>();
-        for (Persona persona : personas) {
+        for (PersonaRolDTO personaRol : personas) {
+            Persona persona = personaRol.getPersona();
             if (persona != null) {
-                listaPersonas.add(persona);
-                persona.setDenuncias(List.of(denuncia)); // Asignar la denuncia a la persona
+                Persona existente = personaRepository.findByDocumento(persona.getDocumento());
+                if (existente != null) {
+                    listaPersonas.add(existente);
+                } else {
+                    listaPersonas.add(personaRepository.save(persona));
+                }
             } else {
                 System.out.println("Persona nula encontrada, no se guardará en la base de datos.");
             }
         }
 
-        personaRepository.saveAll(listaPersonas);
+        return listaPersonas;
 
     }
 

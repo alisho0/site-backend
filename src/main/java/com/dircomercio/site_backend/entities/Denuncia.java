@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,6 +16,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -23,6 +25,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 @Table(name = "denuncias")
+@Builder
 public class Denuncia {
 
     @Id
@@ -34,16 +37,9 @@ public class Denuncia {
     @JsonProperty("motivo")
     private List<String> motivo;
     private String estado;
-
-    @ManyToMany
-    @JoinTable(name = "denuncia_persona", // Nombre de la tabla intermedia 
-        joinColumns = @JoinColumn(name = "denuncia_id"), // Hace referencia al id que será FK en la tabla intermedia de esta clase
-        inverseJoinColumns = @JoinColumn(name = "persona_id") // Hace referencia al id que será FK en la tabla intermedia, pero de la otra clase
-        )
-    private List<Persona> personas;
     
-    @OneToMany(mappedBy = "denuncia")
-    private List<Documento> documentos;
+    @OneToMany(mappedBy = "denuncia", cascade = CascadeType.ALL)
+    private List<DenunciaPersona> denunciaPersonas;
 
     @OneToOne
     @JoinColumn(name = "expediente_id", referencedColumnName = "id", nullable = true)

@@ -1,5 +1,7 @@
 package com.dircomercio.site_backend.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,22 +14,27 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "documentos")
+@Table(name = "denuncia_persona")
 @Builder
-public class Documento {
+public class DenunciaPersona {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String nombre;
-    private String formato;
-    private String ruta;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "denuncia_id", nullable = false)
-    private Denuncia denuncia;
+	@ManyToOne
+	@JoinColumn(name = "denuncia_id")
+    @JsonIgnore
+	private Denuncia denuncia;
+
+	@ManyToOne
+	@JoinColumn(name = "persona_id")
+    @JsonIgnore
+	private Persona persona;
+
+	private String rol;
 }
