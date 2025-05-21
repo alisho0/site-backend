@@ -8,4 +8,7 @@ import lombok.Data;
 public class PersonaRolDTO {
     private Persona persona;
     private String rol;
+    private String nombreDelegado;
+    private String apellidoDelegado;
+    private String dniDelegado;
 }

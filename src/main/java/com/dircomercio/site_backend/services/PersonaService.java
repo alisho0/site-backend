@@ -11,4 +11,6 @@ public interface PersonaService {
     List<Persona> guardarPersonas(List<PersonaRolDTO> personas);
 
     void modificarPersona(Long id, Persona persona);
+
+    List<Persona> traerPersonas();
 }

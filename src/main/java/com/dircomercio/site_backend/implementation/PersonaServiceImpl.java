@@ -44,4 +44,8 @@ public class PersonaServiceImpl implements PersonaService {
         throw new UnsupportedOperationException("Unimplemented method 'modificarPersona'");
     }
 
+    public List<Persona> traerPersonas() {
+        return (List<Persona>) personaRepository.findAll();
+    }
+
 }

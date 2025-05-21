@@ -37,4 +37,8 @@ public class DenunciaPersona {
 	private Persona persona;
 
 	private String rol;
+    private String nombreDelegado;
+    private String apellidoDelegado;
+    private String dniDelegado;
+
 }

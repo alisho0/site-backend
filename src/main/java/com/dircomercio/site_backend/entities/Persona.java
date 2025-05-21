@@ -35,9 +35,7 @@ public class Persona {
     private String cp;
     private String localidad;
     private String documento;
-    private String tipoDocumento;
     private String domicilio;
-    private String wpp;
 
     // @OneToOne(mappedBy = "persona")
     // private Usuario usuario;

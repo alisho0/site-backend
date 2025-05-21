@@ -25,6 +25,9 @@ public class DenunciaPersonaServiceImpl implements DenunciaPersonaService{
                 .denuncia(denuncia)
                 .persona(personaRol.getPersona())
                 .rol(personaRol.getRol())
+                .nombreDelegado(personaRol.getNombreDelegado())
+                .apellidoDelegado(personaRol.getApellidoDelegado())
+                .dniDelegado(personaRol.getDniDelegado())
                 .build();
 
                 denunciaPersonaRepository.save(dp);

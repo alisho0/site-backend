@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.dircomercio.site_backend.dtos.DenunciaDTO;
+import com.dircomercio.site_backend.dtos.PersonaRolDTO;
 import com.dircomercio.site_backend.entities.Denuncia;
 import com.dircomercio.site_backend.entities.DenunciaPersona;
 import com.dircomercio.site_backend.entities.Persona;
@@ -43,14 +44,27 @@ public class DenunciaServiceImpl implements DenunciaService{
         try {
             // Aquí se crea la denuncia
             Denuncia denuncia = new Denuncia();
-            denuncia.setDescripcion(denuncia.getDescripcion());
-            denuncia.setObjeto(denuncia.getObjeto());
-            denuncia.setMotivo(denuncia.getMotivo());
+            denuncia.setDescripcion(denunciaDTO.getDescripcion());
+            denuncia.setObjeto(denunciaDTO.getObjeto());
+            denuncia.setMotivo(denunciaDTO.getMotivo());
             denunciaRepository.save(denuncia);
 
             // Aquí se crean (si es que no existen) y vinculan las personas a la denuncia
             List<Persona> personasPersistidas = personaService.guardarPersonas(denunciaDTO.getPersonas());
-            dPersonaService.vincularPersonaDenuncia(denunciaDTO.getPersonas(), denuncia);
+            // 3. Mapear roles a personas persistidas
+            List<PersonaRolDTO> personasRolPersistidas = new ArrayList<>();
+            for (int i = 0; i < denunciaDTO.getPersonas().size(); i++) {
+                PersonaRolDTO original = denunciaDTO.getPersonas().get(i);
+                Persona personaPersistida = personasPersistidas.get(i);
+                PersonaRolDTO dto = new PersonaRolDTO();
+                dto.setPersona(personaPersistida);
+                dto.setRol(original.getRol());
+                dto.setNombreDelegado(original.getNombreDelegado());
+                dto.setApellidoDelegado(original.getApellidoDelegado());
+                dto.setDniDelegado(original.getDniDelegado());
+                personasRolPersistidas.add(dto);
+            }
+            dPersonaService.vincularPersonaDenuncia(personasRolPersistidas, denuncia);
 
             // Aquí se guardan los documentos, sigue igual
             documentoService.guardarDocumentos(files, denuncia);
