@@ -36,6 +36,7 @@ public class Persona {
     private String localidad;
     private String documento;
     private String domicilio;
+    private String fax;
 
     // @OneToOne(mappedBy = "persona")
     // private Usuario usuario;
