@@ -10,8 +10,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -36,7 +34,8 @@ public class Denuncia {
     private List<String> objeto;
     @JsonProperty("motivo")
     private List<String> motivo;
-    private String estado;
+    @Builder.Default
+    private String estado = "PENDIENTE";
     
     @OneToMany(mappedBy = "denuncia", cascade = CascadeType.ALL)
     private List<DenunciaPersona> denunciaPersonas;

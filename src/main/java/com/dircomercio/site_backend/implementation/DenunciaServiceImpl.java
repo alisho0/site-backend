@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.dircomercio.site_backend.dtos.DenunciaDTO;
+import com.dircomercio.site_backend.dtos.DenunciaRespuestaDTO;
+import com.dircomercio.site_backend.dtos.PersonaConRolDTO;
 import com.dircomercio.site_backend.dtos.PersonaRolDTO;
 import com.dircomercio.site_backend.entities.Denuncia;
 import com.dircomercio.site_backend.entities.DenunciaPersona;
@@ -76,13 +78,44 @@ public class DenunciaServiceImpl implements DenunciaService{
     }
 
     @Override
-    public List<Denuncia> traerDenuncias() throws NotFoundException {
-        List<Denuncia> denuncias = new ArrayList<>();
+    public List<DenunciaRespuestaDTO> traerDenuncias() throws NotFoundException {
         try {
-            denuncias = (List<Denuncia>) denunciaRepository.findAll();
-            return denuncias;
+            List<Denuncia> denuncias = (List<Denuncia>) denunciaRepository.findAll();
+            List<DenunciaRespuestaDTO> respuesta = new ArrayList<>();
+
+            for (Denuncia denuncia : denuncias) {
+                DenunciaRespuestaDTO dto = new DenunciaRespuestaDTO();
+                dto.setId(denuncia.getId());
+                dto.setDescripcion(denuncia.getDescripcion());
+                dto.setEstado(denuncia.getEstado());
+                dto.setMotivo(denuncia.getMotivo());
+                dto.setObjeto(denuncia.getObjeto());
+
+                List<PersonaConRolDTO> personas = new ArrayList<>();
+                for (DenunciaPersona dp : denuncia.getDenunciaPersonas()) {
+                    PersonaConRolDTO p = new PersonaConRolDTO(); // Crimenes perfecto, los aviones, donde manda marinero
+                    p.setId(dp.getPersona().getId());
+                    p.setNombre(dp.getPersona().getNombre());
+                    p.setApellido(dp.getPersona().getApellido());
+                    p.setEmail(dp.getPersona().getEmail());
+                    p.setTelefono(dp.getPersona().getTelefono());
+                    p.setCp(dp.getPersona().getCp());
+                    p.setLocalidad(dp.getPersona().getLocalidad());
+                    p.setDocumento(dp.getPersona().getDocumento());
+                    p.setDomicilio(dp.getPersona().getDomicilio());
+                    p.setFax(dp.getPersona().getFax());
+                    p.setRol(dp.getRol());
+                    p.setNombreDelegado(dp.getNombreDelegado());
+                    p.setApellidoDelegado(dp.getApellidoDelegado());
+                    p.setDniDelegado(dp.getDniDelegado());
+                    personas.add(p);
+                }
+                dto.setPersonas(personas);
+                respuesta.add(dto);
+            }
+            return respuesta;
         } catch (Exception e) {
-            e.printStackTrace();
+            e.getMessage();
             throw new NotFoundException();
         }
     }
