@@ -11,4 +11,5 @@ public interface DenunciaService {
 
     void guardarDenuncia(DenunciaDTO denuncia, List<MultipartFile> files);
     List<DenunciaRespuestaDTO> traerDenuncias() throws Exception;
+    DenunciaRespuestaDTO traerDenunciaPorId(Long id) throws Exception;
 }

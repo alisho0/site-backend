@@ -19,6 +19,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @RestController
@@ -58,5 +61,13 @@ public class DenunciaController {
             return ResponseEntity.badRequest().body("No se pudo traer la denuncia.");
         }
     }
-    
+
+    @GetMapping("/traerDenunciaPorId/{id}")
+    public ResponseEntity<?> traerDenunciaPorId(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok().body(denunciaService.traerDenunciaPorId(id));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("No se pudo traer la denuncia.");
+        }
+    }
 }

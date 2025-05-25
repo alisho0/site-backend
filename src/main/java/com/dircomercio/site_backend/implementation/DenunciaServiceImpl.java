@@ -119,4 +119,42 @@ public class DenunciaServiceImpl implements DenunciaService{
             throw new NotFoundException();
         }
     }
+
+    @Override
+    public DenunciaRespuestaDTO traerDenunciaPorId(Long id) throws Exception {
+        try {
+            Denuncia denuncia = denunciaRepository.findById(id).orElseThrow();
+            DenunciaRespuestaDTO dto = new DenunciaRespuestaDTO();
+
+            dto.setId(denuncia.getId());
+            dto.setDescripcion(denuncia.getDescripcion());
+            dto.setEstado(denuncia.getEstado());
+            dto.setMotivo(denuncia.getMotivo());
+            dto.setObjeto(denuncia.getObjeto());
+
+            List<PersonaConRolDTO> personas = new ArrayList<>();
+            for (DenunciaPersona dp : denuncia.getDenunciaPersonas()) {
+                PersonaConRolDTO p = new PersonaConRolDTO();
+                p.setId(dp.getPersona().getId());
+                p.setNombre(dp.getPersona().getNombre());
+                p.setApellido(dp.getPersona().getApellido());
+                p.setEmail(dp.getPersona().getEmail());
+                p.setTelefono(dp.getPersona().getTelefono());
+                p.setCp(dp.getPersona().getCp());
+                p.setLocalidad(dp.getPersona().getLocalidad());
+                p.setDocumento(dp.getPersona().getDocumento());
+                p.setDomicilio(dp.getPersona().getDomicilio());
+                p.setFax(dp.getPersona().getFax());
+                p.setRol(dp.getRol());
+                p.setNombreDelegado(dp.getNombreDelegado());
+                p.setApellidoDelegado(dp.getApellidoDelegado());
+                p.setDniDelegado(dp.getDniDelegado());
+                personas.add(p);
+            }
+            dto.setPersonas(personas);
+            return dto;
+        } catch (Exception e) {
+            throw new Exception("No se encontró la denuncia con el ID proporcionado");
+        }
+    }
 }
