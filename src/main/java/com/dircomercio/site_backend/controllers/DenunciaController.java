@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.dircomercio.site_backend.dtos.DenunciaDTO;
+import com.dircomercio.site_backend.dtos.DenunciaUpdateDTO;
 import com.dircomercio.site_backend.services.DenunciaService;
 import com.dircomercio.site_backend.services.DocumentoService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,6 +22,9 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 
@@ -68,6 +72,16 @@ public class DenunciaController {
             return ResponseEntity.ok().body(denunciaService.traerDenunciaPorId(id));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("No se pudo traer la denuncia.");
+        }
+    }
+
+    @PutMapping("actualizarEstado/{id}")
+    public ResponseEntity<?> actualizarEstado(@PathVariable Long id, @RequestBody DenunciaUpdateDTO dto) {
+        try {
+            denunciaService.actualizarEstadoDenuncia(id, dto);
+            return ResponseEntity.ok().body("El estado de la denuncia fue actualizada correctamente.");
+        } catch (Exception e) {
+            throw new RuntimeException("No se pudo actualizar el estado de la denuncia.");
         }
     }
 }

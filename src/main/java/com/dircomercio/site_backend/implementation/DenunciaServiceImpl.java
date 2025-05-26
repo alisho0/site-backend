@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.dircomercio.site_backend.dtos.DenunciaDTO;
 import com.dircomercio.site_backend.dtos.DenunciaRespuestaDTO;
+import com.dircomercio.site_backend.dtos.DenunciaUpdateDTO;
 import com.dircomercio.site_backend.dtos.PersonaConRolDTO;
 import com.dircomercio.site_backend.dtos.PersonaRolDTO;
 import com.dircomercio.site_backend.entities.Denuncia;
@@ -153,6 +154,23 @@ public class DenunciaServiceImpl implements DenunciaService{
             }
             dto.setPersonas(personas);
             return dto;
+        } catch (Exception e) {
+            throw new Exception("No se encontró la denuncia con el ID proporcionado");
+        }
+    }
+
+    @Override
+    public Denuncia actualizarEstadoDenuncia(Long id, DenunciaUpdateDTO dto) throws Exception {
+        try {
+            Denuncia denuncia = denunciaRepository.findById(id).orElseThrow();
+            denuncia.setEstado(dto.getEstado());
+
+            if (denuncia.getEstado().equals("EN PROCESO")) {
+                // Lógica para crear la denuncia. 
+                System.out.println("Se ha cambiado el estado a EN PROCESO");
+            }
+
+            return denunciaRepository.save(denuncia);
         } catch (Exception e) {
             throw new Exception("No se encontró la denuncia con el ID proporcionado");
         }
