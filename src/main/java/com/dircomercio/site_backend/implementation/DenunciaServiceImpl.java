@@ -20,6 +20,7 @@ import com.dircomercio.site_backend.repositories.DenunciaRepository;
 import com.dircomercio.site_backend.services.DenunciaPersonaService;
 import com.dircomercio.site_backend.services.DenunciaService;
 import com.dircomercio.site_backend.services.DocumentoService;
+import com.dircomercio.site_backend.services.EmailService;
 import com.dircomercio.site_backend.services.PersonaService;
 
 @Service
@@ -36,6 +37,9 @@ public class DenunciaServiceImpl implements DenunciaService{
 
     @Autowired
     DenunciaPersonaService dPersonaService;
+
+    @Autowired
+    EmailService emailService;
 
     @Override
     public void guardarDenuncia(DenunciaDTO denunciaDTO, List<MultipartFile> files) {
@@ -171,6 +175,22 @@ public class DenunciaServiceImpl implements DenunciaService{
             }
 
             return denunciaRepository.save(denuncia);
+        } catch (Exception e) {
+            throw new Exception("No se encontró la denuncia con el ID proporcionado");
+        }
+    }
+
+    @Override
+    public void rechazarDenuncia(Long id, String motivoRechazo) throws Exception {
+        try {
+            Denuncia denuncia = denunciaRepository.findById(id).orElseThrow();
+            denuncia.setEstado("RECHAZADA");
+            denunciaRepository.save(denuncia);
+
+            // Mandar un email al denunciante informando del rechazo
+            String destinarario = denuncia.getDenunciaPersonas().get(0).getPersona().getEmail();
+            String asunto = "Denuncia Rechazada";
+            emailService.enviarEmail(destinarario, asunto, motivoRechazo);
         } catch (Exception e) {
             throw new Exception("No se encontró la denuncia con el ID proporcionado");
         }

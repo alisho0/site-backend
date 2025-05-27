@@ -15,4 +15,5 @@ public interface DenunciaService {
     List<DenunciaRespuestaDTO> traerDenuncias() throws Exception;
     DenunciaRespuestaDTO traerDenunciaPorId(Long id) throws Exception;
     Denuncia actualizarEstadoDenuncia(Long id, DenunciaUpdateDTO dto) throws Exception;
+    void rechazarDenuncia(Long id, String motivoRechazo) throws Exception;
 }

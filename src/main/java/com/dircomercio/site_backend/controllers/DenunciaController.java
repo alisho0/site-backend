@@ -29,8 +29,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5174")
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/denuncia")
+// http://localhost:8080/denuncia/
 public class DenunciaController {
 
     @Autowired
@@ -75,7 +76,7 @@ public class DenunciaController {
         }
     }
 
-    @PutMapping("actualizarEstado/{id}")
+    @PutMapping("/actualizarEstado/{id}")
     public ResponseEntity<?> actualizarEstado(@PathVariable Long id, @RequestBody DenunciaUpdateDTO dto) {
         try {
             denunciaService.actualizarEstadoDenuncia(id, dto);
@@ -84,4 +85,15 @@ public class DenunciaController {
             throw new RuntimeException("No se pudo actualizar el estado de la denuncia.");
         }
     }
+
+    @PutMapping("/rechazarDenuncia/{id}")
+    public ResponseEntity<?> rechazarDenuncia(@PathVariable Long id, @RequestBody String motivo) {
+        try {
+            denunciaService.rechazarDenuncia(id, motivo);
+            return ResponseEntity.ok().body("La denuncia fue rechazada correctamente.");
+        } catch (Exception e) {
+            throw new RuntimeException("No se pudo rechazar la denuncia.");
+        }
+    }
+    
 }
