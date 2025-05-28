@@ -15,4 +15,7 @@ public interface ExpedienteService {
     Expediente actualizarExpediente(Long id, Expediente expediente);
 
     void eliminarExpediente(Long id);
+
+    // Nuevo método para crear expediente desde una denuncia
+    Expediente crearExpedienteDesdeDenuncia(Long idDenuncia) throws Exception;
 }
