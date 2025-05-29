@@ -21,7 +21,10 @@ import com.dircomercio.site_backend.services.DenunciaPersonaService;
 import com.dircomercio.site_backend.services.DenunciaService;
 import com.dircomercio.site_backend.services.DocumentoService;
 import com.dircomercio.site_backend.services.EmailService;
+import com.dircomercio.site_backend.services.ExpedienteService;
 import com.dircomercio.site_backend.services.PersonaService;
+
+
 
 @Service
 public class DenunciaServiceImpl implements DenunciaService{
@@ -40,6 +43,10 @@ public class DenunciaServiceImpl implements DenunciaService{
 
     @Autowired
     EmailService emailService;
+    // agrego esto mostrar a ale, lo que hice aqui primero fue  inyectar el servicio de expediente
+    @Autowired
+    ExpedienteService expedienteService;
+
 
     @Override
     public void guardarDenuncia(DenunciaDTO denunciaDTO, List<MultipartFile> files) {
@@ -169,11 +176,19 @@ public class DenunciaServiceImpl implements DenunciaService{
             Denuncia denuncia = denunciaRepository.findById(id).orElseThrow();
             denuncia.setEstado(dto.getEstado());
 
-            if (denuncia.getEstado().equals("EN PROCESO")) {
+            /*  if (denuncia.getEstado().equals("EN PROCESO")) {
                 // Lógica para crear la denuncia. 
                 System.out.println("Se ha cambiado el estado a EN PROCESO");
             }
+            */
 
+            // Mostrar a ale para ver que opina de este cambio . Lo que estoy haciendo aqui
+            // es que si el estado de la denuncia esta "En proceso" se va a crear un expediente
+            // asociado a la denuncia, si no no se crea el expediente
+            if (dto.getEstado().equals("EN PROCESO")) {
+                expedienteService.crearExpedienteDesdeDenuncia(denuncia.getId());
+            }
+            
             return denunciaRepository.save(denuncia);
         } catch (Exception e) {
             throw new Exception("No se encontró la denuncia con el ID proporcionado");

@@ -1,12 +1,17 @@
 package com.dircomercio.site_backend.services;
 
+import com.dircomercio.site_backend.dtos.ExpedienteCreateDTO;
 import com.dircomercio.site_backend.entities.Expediente;
 
 import java.util.List;
 
 public interface ExpedienteService {
 
-    Expediente crearExpediente(Expediente expediente);
+    // Crear expediente directamente desde un DTO recibido por el controller
+    Expediente crearExpedienteDesdeDTO(ExpedienteCreateDTO dto);
+
+    // Crear expediente solo si la denuncia fue aceptada
+    Expediente crearExpedienteDesdeDenuncia(Long idDenuncia) throws Exception;
 
     Expediente obtenerExpedientePorId(Long id);
 
@@ -15,7 +20,4 @@ public interface ExpedienteService {
     Expediente actualizarExpediente(Long id, Expediente expediente);
 
     void eliminarExpediente(Long id);
-
-    // Nuevo método para crear expediente desde una denuncia
-    Expediente crearExpedienteDesdeDenuncia(Long idDenuncia) throws Exception;
 }

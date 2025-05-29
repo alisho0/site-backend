@@ -43,4 +43,6 @@ public class Denuncia {
     @OneToOne
     @JoinColumn(name = "expediente_id", referencedColumnName = "id", nullable = true)
     private Expediente expediente;
+
+    
 }

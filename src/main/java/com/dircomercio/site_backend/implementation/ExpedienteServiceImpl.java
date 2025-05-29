@@ -1,20 +1,70 @@
 package com.dircomercio.site_backend.implementation;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+import com.dircomercio.site_backend.dtos.ExpedienteCreateDTO;
 import com.dircomercio.site_backend.entities.Denuncia;
 import com.dircomercio.site_backend.entities.Expediente;
 import com.dircomercio.site_backend.repositories.DenunciaRepository;
 import com.dircomercio.site_backend.repositories.ExpedienteRepository;
+import com.dircomercio.site_backend.repositories.UsuarioRepository;
 import com.dircomercio.site_backend.services.ExpedienteService;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ExpedienteServiceImpl implements ExpedienteService {
 
+    @Autowired
+    private ExpedienteRepository expedienteRepository;
+
+    @Autowired
+    private DenunciaRepository denunciaRepository;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    // ✅ Crear expediente a partir de un DTO, como en el controller
+    @Override
+    public Expediente crearExpedienteDesdeDTO(ExpedienteCreateDTO dto) {
+        Optional<Denuncia> denunciaOpt = denunciaRepository.findById(dto.getId());
+        if (denunciaOpt.isEmpty()) {
+            throw new IllegalArgumentException("La denuncia no existe");
+        }
+
+        Denuncia denuncia = denunciaOpt.get();
+        if (!"ACEPTADA".equalsIgnoreCase(denuncia.getEstado())) {
+            throw new IllegalArgumentException("La denuncia no está aceptada");
+        }
+
+        Expediente expediente = new Expediente();
+        expediente.setNro_exp(dto.getNroExp());
+        expediente.setCant_folios(dto.getCantFolios());
+        expediente.setFecha_inicio(dto.getFechaInicio());
+        expediente.setFecha_finalizacion(dto.getFechaFinalizacion());
+        expediente.setHipervulnerable(dto.getHipervulnerable());
+        expediente.setDelegacion(dto.getDelegacion());
+        expediente.setDenuncia(denuncia);
+
+        if (dto.getUsuarioId() != null) {
+            usuarioRepository.findById(dto.getUsuarioId()).ifPresentOrElse(
+                expediente::setUsuario,
+                () -> { throw new IllegalArgumentException("Usuario no encontrado"); }
+            );
+        }
+
+        Expediente expedienteGuardado = expedienteRepository.save(expediente);
+
+        // Asociar expediente a la denuncia
+        denuncia.setExpediente(expedienteGuardado);
+        denunciaRepository.save(denuncia);
+
+        return expedienteGuardado;
+    }
+
+    //  Crear expediente desde ID de denuncia 
     @Override
     public Expediente crearExpedienteDesdeDenuncia(Long denunciaId) {
         Optional<Denuncia> denunciaOpt = denunciaRepository.findById(denunciaId);
@@ -29,37 +79,14 @@ public class ExpedienteServiceImpl implements ExpedienteService {
 
         Expediente expediente = new Expediente();
         expediente.setDenuncia(denuncia);
-        return expedienteRepository.save(expediente);
-    }
 
-    @Autowired
-    private ExpedienteRepository expedienteRepository;
+        Expediente expedienteGuardado = expedienteRepository.save(expediente);
 
-    @Autowired
-    private DenunciaRepository denunciaRepository;
+        // Asociar también a la denuncia
+        denuncia.setExpediente(expedienteGuardado);
+        denunciaRepository.save(denuncia);
 
-    @Override
-    public Expediente crearExpediente(Expediente expediente) {
-        // Validar que la denuncia asociada esté aceptada
-        if (expediente.getDenuncia() == null || expediente.getDenuncia().getId() == null) {
-            throw new IllegalArgumentException("La denuncia asociada es obligatoria");
-        }
-
-        Optional<Denuncia> denunciaOpt = denunciaRepository.findById(expediente.getDenuncia().getId());
-        if (denunciaOpt.isEmpty()) {
-            throw new IllegalArgumentException("La denuncia no existe");
-        }
-
-        Denuncia denuncia = denunciaOpt.get();
-        if (!"ACEPTADA".equalsIgnoreCase(denuncia.getEstado())) {
-            throw new IllegalArgumentException("La denuncia no está aceptada");
-        }
-
-        // Asociar el expediente a la denuncia
-        expediente.setDenuncia(denuncia);
-
-        // Guardar el expediente
-        return expedienteRepository.save(expediente);
+        return expedienteGuardado;
     }
 
     @Override
@@ -70,7 +97,7 @@ public class ExpedienteServiceImpl implements ExpedienteService {
 
     @Override
     public List<Expediente> listarExpedientes() {
-        return (List<Expediente>) expedienteRepository .findAll();
+        return (List<Expediente>) expedienteRepository.findAll();
     }
 
     @Override
