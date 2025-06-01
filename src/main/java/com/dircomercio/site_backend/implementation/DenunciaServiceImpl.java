@@ -175,29 +175,33 @@ public class DenunciaServiceImpl implements DenunciaService{
         try {
             Denuncia denuncia = denunciaRepository.findById(id).orElseThrow();
             denuncia.setEstado(dto.getEstado());
-
-            /*  if (denuncia.getEstado().equals("EN PROCESO")) {
-                // Lógica para crear la denuncia. 
-                System.out.println("Se ha cambiado el estado a EN PROCESO");
+            String asunto = "";
+            switch (denuncia.getEstado().toUpperCase()) {
+                case "EN PROCESO":
+                    asunto = "DENUNCIA EN PROCESO";
+                    // Aquí podrías crear el expediente
+                    break;
+                case "NO ADMITIDA":
+                    asunto = "DENUNCIA NO ADMITIDA";
+                    break;
+                case "RECHAZADA":
+                    asunto = "DENUNCIA RECHAZADA";
+                    break;
+                default:
+                    asunto = "ACTUALIZACIÓN DE DENUNCIA";
             }
-            */
-
-            // Mostrar a ale para ver que opina de este cambio . Lo que estoy haciendo aqui
-            // es que si el estado de la denuncia esta "En proceso" se va a crear un expediente
-            // asociado a la denuncia, si no no se crea el expediente
-            if (dto.getEstado().equals("EN PROCESO")) {
-                expedienteService.crearExpedienteDesdeDenuncia(denuncia.getId());
-            }
-            
+            String destinarario = denuncia.getDenunciaPersonas().get(0).getPersona().getEmail();
+            // Este emailService no iría comentado, pero por el momento lo dejo comentado
+            //emailService.enviarEmail(destinarario, asunto, dto.getMotivo()); 
             return denunciaRepository.save(denuncia);
         } catch (Exception e) {
             throw new Exception("No se encontró la denuncia con el ID proporcionado");
         }
     }
-
+    // Esto ya no iría, pero lo dejo para que vean 
     @Override
     public void rechazarDenuncia(Long id, String motivoRechazo) throws Exception {
-        try {
+        /* try {
             Denuncia denuncia = denunciaRepository.findById(id).orElseThrow();
             denuncia.setEstado("RECHAZADA");
             denunciaRepository.save(denuncia);
@@ -208,6 +212,6 @@ public class DenunciaServiceImpl implements DenunciaService{
             emailService.enviarEmail(destinarario, asunto, motivoRechazo);
         } catch (Exception e) {
             throw new Exception("No se encontró la denuncia con el ID proporcionado");
-        }
-    }
+        } */
+    } 
 }
