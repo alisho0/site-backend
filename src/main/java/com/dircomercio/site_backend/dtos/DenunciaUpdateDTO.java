@@ -5,4 +5,5 @@ import lombok.Data;
 @Data
 public class DenunciaUpdateDTO {
     private String estado;
+    private String motivo;
 }
