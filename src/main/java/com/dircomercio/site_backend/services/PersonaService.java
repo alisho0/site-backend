@@ -3,12 +3,13 @@ package com.dircomercio.site_backend.services;
 import java.util.List;
 import java.util.Optional;
 
+import com.dircomercio.site_backend.dtos.PersonaRolDTO;
 import com.dircomercio.site_backend.entities.Denuncia;
 import com.dircomercio.site_backend.entities.Persona;
 
 public interface PersonaService {
 
-    void guardarPersonas(List<Persona> personas, Denuncia denuncia);
+    List<Persona> guardarPersonas(List<PersonaRolDTO> personas);
 
     Optional<Persona> buscarPersonaPorId(Long id);
 
@@ -21,4 +22,6 @@ public interface PersonaService {
     //Persona actualizarContacto(Long id, Persona nuevosDatos); PARA REVISAR
 
     void modificarPersona(Long id, Persona persona);
+
+    List<Persona> traerPersonas();
 }

@@ -8,7 +8,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.dircomercio.site_backend.entities.Denuncia;
+import com.dircomercio.site_backend.dtos.PersonaRolDTO;
 import com.dircomercio.site_backend.entities.Persona;
 import com.dircomercio.site_backend.repositories.DenunciaRepository;
 import com.dircomercio.site_backend.repositories.PersonaRepository;
@@ -24,18 +24,23 @@ public class PersonaServiceImpl implements PersonaService {
     DenunciaRepository denunciaRepository;
 
     @Override
-    public void guardarPersonas(List<Persona> personas, Denuncia denuncia) {
+    public List<Persona> guardarPersonas(List<PersonaRolDTO> personas) {
         List<Persona> listaPersonas = new ArrayList<>();
-        for (Persona persona : personas) {
+        for (PersonaRolDTO personaRol : personas) {
+            Persona persona = personaRol.getPersona();
             if (persona != null) {
-                listaPersonas.add(persona);
-                persona.setDenuncias(List.of(denuncia)); // Asignar la denuncia a la persona
+                Persona existente = personaRepository.findByDocumento(persona.getDocumento());
+                if (existente != null) {
+                    listaPersonas.add(existente);
+                } else {
+                    listaPersonas.add(personaRepository.save(persona));
+                }
             } else {
                 System.out.println("Persona nula encontrada, no se guardará en la base de datos.");
             }
         }
 
-        personaRepository.saveAll(listaPersonas);
+        return listaPersonas;
 
     }
 
@@ -65,6 +70,10 @@ public class PersonaServiceImpl implements PersonaService {
     public void modificarPersona(Long id, Persona persona) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'modificarPersona'");
+    }
+
+    public List<Persona> traerPersonas() {
+        return (List<Persona>) personaRepository.findAll();
     }
 
 }

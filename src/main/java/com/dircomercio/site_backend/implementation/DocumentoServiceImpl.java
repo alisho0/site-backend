@@ -4,7 +4,6 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.rmi.server.UID;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -25,7 +24,7 @@ public class DocumentoServiceImpl implements DocumentoService {
     DocumentoRepository documentoRepository;
 
     @Override
-    public List<Documento> guardarDocumentos(List<MultipartFile> files) throws Exception {
+    public List<Documento> guardarDocumentos(List<MultipartFile> files, Denuncia denuncia) throws Exception {
         List<Documento> documentos = new ArrayList<>();
 
         try {
@@ -55,8 +54,7 @@ public class DocumentoServiceImpl implements DocumentoService {
                 documento.setNombre(newFileName);
                 documento.setFormato(fileExtension);
                 documento.setRuta(path.toString()); // Guardamos la ruta del archivo
-                //documento.setDenuncia(denuncia);
-                documento.setDenuncia(null);
+                documento.setDenuncia(denuncia);
                 Files.write(path, bytes);
                 documentos.add(documento);
             }
