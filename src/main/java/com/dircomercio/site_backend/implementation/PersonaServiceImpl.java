@@ -49,29 +49,6 @@ public class PersonaServiceImpl implements PersonaService {
         return personaRepository.findById(id);
     } 
 
-    @Override
-    public List<Persona> buscarPersonasPorDenuncia(Long idDenuncia) {
-        return denunciaRepository.findById(idDenuncia)
-                .map(Denuncia::getPersonas)
-                .orElse(Collections.emptyList());
-    }
-
-    @Override
-    public List<Persona> listarPersonas() {
-        return (List<Persona>) personaRepository.findAll();
-    }
-
-    @Override
-    public Optional<Persona> buscarPorDni(String tipoDocumento, String numeroDocumento) {
-        return personaRepository.findByDocumento(tipoDocumento, numeroDocumento);
-    }
-
-    @Override
-    public void modificarPersona(Long id, Persona persona) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'modificarPersona'");
-    }
-
     public List<Persona> traerPersonas() {
         return (List<Persona>) personaRepository.findAll();
     }

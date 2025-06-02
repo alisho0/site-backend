@@ -12,16 +12,8 @@ public interface PersonaService {
     List<Persona> guardarPersonas(List<PersonaRolDTO> personas);
 
     Optional<Persona> buscarPersonaPorId(Long id);
-
-    List<Persona> buscarPersonasPorDenuncia(Long idDenuncia); // POR AHORA NO SE IMPLEMENTA
-
-    List<Persona> listarPersonas();
-
-    Optional<Persona> buscarPorDni(String tipoDocumento, String numeroDocumento);
-
     //Persona actualizarContacto(Long id, Persona nuevosDatos); PARA REVISAR
 
-    void modificarPersona(Long id, Persona persona);
 
     List<Persona> traerPersonas();
 }
