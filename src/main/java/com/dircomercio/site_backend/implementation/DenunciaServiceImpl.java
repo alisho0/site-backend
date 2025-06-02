@@ -21,7 +21,10 @@ import com.dircomercio.site_backend.services.DenunciaPersonaService;
 import com.dircomercio.site_backend.services.DenunciaService;
 import com.dircomercio.site_backend.services.DocumentoService;
 import com.dircomercio.site_backend.services.EmailService;
+import com.dircomercio.site_backend.services.ExpedienteService;
 import com.dircomercio.site_backend.services.PersonaService;
+
+
 
 @Service
 public class DenunciaServiceImpl implements DenunciaService{
@@ -40,6 +43,10 @@ public class DenunciaServiceImpl implements DenunciaService{
 
     @Autowired
     EmailService emailService;
+    // agrego esto mostrar a ale, lo que hice aqui primero fue  inyectar el servicio de expediente
+    @Autowired
+    ExpedienteService expedienteService;
+
 
     @Override
     public void guardarDenuncia(DenunciaDTO denunciaDTO, List<MultipartFile> files) {
@@ -172,7 +179,7 @@ public class DenunciaServiceImpl implements DenunciaService{
             switch (denuncia.getEstado().toUpperCase()) {
                 case "EN PROCESO":
                     asunto = "DENUNCIA EN PROCESO";
-                    // Aquí podrías crear el expediente
+                    expedienteService.crearExpedienteDesdeDenuncia(denuncia.getId());
                     break;
                 case "NO ADMITIDA":
                     asunto = "DENUNCIA NO ADMITIDA";
