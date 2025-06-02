@@ -1,18 +1,19 @@
 package com.dircomercio.site_backend.implementation;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.dircomercio.site_backend.dtos.ExpedienteCreateDTO;
+import com.dircomercio.site_backend.dtos.ExpedienteCreateMinimalDTO;
 import com.dircomercio.site_backend.entities.Denuncia;
 import com.dircomercio.site_backend.entities.Expediente;
 import com.dircomercio.site_backend.repositories.DenunciaRepository;
 import com.dircomercio.site_backend.repositories.ExpedienteRepository;
 import com.dircomercio.site_backend.repositories.UsuarioRepository;
 import com.dircomercio.site_backend.services.ExpedienteService;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ExpedienteServiceImpl implements ExpedienteService {
@@ -26,7 +27,7 @@ public class ExpedienteServiceImpl implements ExpedienteService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    // ✅ Crear expediente a partir de un DTO, como en el controller
+    // Crear expediente desde DTO completo
     @Override
     public Expediente crearExpedienteDesdeDTO(ExpedienteCreateDTO dto) {
         Optional<Denuncia> denunciaOpt = denunciaRepository.findById(dto.getId());
@@ -48,23 +49,26 @@ public class ExpedienteServiceImpl implements ExpedienteService {
         expediente.setDelegacion(dto.getDelegacion());
         expediente.setDenuncia(denuncia);
 
-        if (dto.getUsuarioId() != null) {
-            usuarioRepository.findById(dto.getUsuarioId()).ifPresentOrElse(
-                expediente::setUsuario,
-                () -> { throw new IllegalArgumentException("Usuario no encontrado"); }
-            );
-        }
-
-        Expediente expedienteGuardado = expedienteRepository.save(expediente);
-
-        // Asociar expediente a la denuncia
-        denuncia.setExpediente(expedienteGuardado);
-        denunciaRepository.save(denuncia);
-
-        return expedienteGuardado;
+        return expedienteRepository.save(expediente);
     }
 
-    //  Crear expediente desde ID de denuncia 
+    // Crear expediente con datos mínimos
+    @Override
+    public Expediente crearExpedienteDesdeMinimalDTO(ExpedienteCreateMinimalDTO dto) {
+        Expediente expediente = new Expediente();
+
+        expediente.setNro_exp(dto.getNro_exp()); // 
+        expediente.setCant_folios(null); // Se completará más adelante
+        expediente.setFecha_inicio(null);
+        expediente.setFecha_finalizacion(null);
+        expediente.setHipervulnerable(null);
+        expediente.setDelegacion(null);
+        expediente.setDenuncia(null); // Se asociará después
+
+        return expedienteRepository.save(expediente);
+    }
+
+    // Crear expediente a partir de una denuncia aceptada
     @Override
     public Expediente crearExpedienteDesdeDenuncia(Long denunciaId) {
         Optional<Denuncia> denunciaOpt = denunciaRepository.findById(denunciaId);
@@ -79,10 +83,16 @@ public class ExpedienteServiceImpl implements ExpedienteService {
 
         Expediente expediente = new Expediente();
         expediente.setDenuncia(denuncia);
+        expediente.setNro_exp(null);
+        expediente.setCant_folios(null);
+        expediente.setFecha_inicio(null);
+        expediente.setFecha_finalizacion(null);
+        expediente.setHipervulnerable(null);
+        expediente.setDelegacion(null);
 
         Expediente expedienteGuardado = expedienteRepository.save(expediente);
 
-        // Asociar también a la denuncia
+        // Asociar el expediente a la denuncia
         denuncia.setExpediente(expedienteGuardado);
         denunciaRepository.save(denuncia);
 
@@ -92,7 +102,7 @@ public class ExpedienteServiceImpl implements ExpedienteService {
     @Override
     public Expediente obtenerExpedientePorId(Long id) {
         return expedienteRepository.findById(id).orElseThrow(() ->
-            new IllegalArgumentException("Expediente no encontrado con ID: " + id));
+                new IllegalArgumentException("Expediente no encontrado con ID: " + id));
     }
 
     @Override
@@ -109,7 +119,7 @@ public class ExpedienteServiceImpl implements ExpedienteService {
             expediente.setFecha_finalizacion(expedienteActualizado.getFecha_finalizacion());
             expediente.setHipervulnerable(expedienteActualizado.getHipervulnerable());
             expediente.setDelegacion(expedienteActualizado.getDelegacion());
-            expediente.setUsuario(expedienteActualizado.getUsuario());
+            expediente.setDenuncia(expedienteActualizado.getDenuncia());
             return expedienteRepository.save(expediente);
         }).orElseThrow(() -> new IllegalArgumentException("Expediente no encontrado con ID: " + id));
     }
