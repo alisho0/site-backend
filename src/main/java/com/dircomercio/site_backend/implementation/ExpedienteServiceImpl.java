@@ -77,18 +77,18 @@ public class ExpedienteServiceImpl implements ExpedienteService {
         }
 
         Denuncia denuncia = denunciaOpt.get();
-        if (!"ACEPTADA".equalsIgnoreCase(denuncia.getEstado())) {
+        if (!"EN PROCESO".equalsIgnoreCase(denuncia.getEstado())) {
             throw new IllegalArgumentException("La denuncia no está aceptada");
         }
 
         Expediente expediente = new Expediente();
-        expediente.setDenuncia(denuncia);
-        expediente.setNro_exp(null);
-        expediente.setCant_folios(null);
-        expediente.setFecha_inicio(null);
-        expediente.setFecha_finalizacion(null);
-        expediente.setHipervulnerable(null);
-        expediente.setDelegacion(null);
+        // expediente.setDenuncia(denuncia);
+        // expediente.setNro_exp(null);
+        // expediente.setCant_folios(null);
+        // expediente.setFecha_inicio(null);
+        // expediente.setFecha_finalizacion(null);
+        // expediente.setHipervulnerable(null);
+        // expediente.setDelegacion(null);
 
         Expediente expedienteGuardado = expedienteRepository.save(expediente);
 

@@ -179,7 +179,7 @@ public class DenunciaServiceImpl implements DenunciaService{
             switch (denuncia.getEstado().toUpperCase()) {
                 case "EN PROCESO":
                     asunto = "DENUNCIA EN PROCESO";
-                    // Aquí podrías crear el expediente
+                    expedienteService.crearExpedienteDesdeDenuncia(denuncia.getId());
                     break;
                 case "NO ADMITIDA":
                     asunto = "DENUNCIA NO ADMITIDA";
