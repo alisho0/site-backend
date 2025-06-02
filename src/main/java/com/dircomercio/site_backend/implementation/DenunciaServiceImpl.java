@@ -184,8 +184,13 @@ public class DenunciaServiceImpl implements DenunciaService{
                     asunto = "ACTUALIZACIÓN DE DENUNCIA";
             }
             String destinarario = denuncia.getDenunciaPersonas().get(0).getPersona().getEmail();
+            String msjHtml = "<h2>Hola " + denuncia.getDenunciaPersonas().get(0).getNombreDelegado() + ",</h2>"
+            + "<br>"
+            + "<p>Su denuncia ha cambiado de estado a <b>"+asunto+"</b>.</p>"
+            + "<br>"
+            + "<p><b>Motivo:</b> " + dto.getMotivo() + "</p>";
             // Este emailService no iría comentado, pero por el momento lo dejo comentado
-            //emailService.enviarEmail(destinarario, asunto, dto.getMotivo()); 
+            emailService.enviarEmail(destinarario, asunto, msjHtml); 
             return denunciaRepository.save(denuncia);
         } catch (Exception e) {
             throw new Exception("No se encontró la denuncia con el ID proporcionado");
