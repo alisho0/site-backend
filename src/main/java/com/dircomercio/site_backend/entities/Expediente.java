@@ -1,5 +1,6 @@
 package com.dircomercio.site_backend.entities;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import jakarta.persistence.Entity;
@@ -28,8 +29,8 @@ public class Expediente {
     private Long id;
     private String nro_exp;
     private String cant_folios;
-    private String fecha_inicio;
-    private String fecha_finalizacion;
+    private LocalDate fecha_inicio;
+    private LocalDate fecha_finalizacion;
     private String hipervulnerable;
     private String delegacion;
 

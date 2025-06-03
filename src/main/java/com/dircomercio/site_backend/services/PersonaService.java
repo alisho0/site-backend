@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import com.dircomercio.site_backend.dtos.PersonaRolDTO;
-import com.dircomercio.site_backend.entities.Denuncia;
 import com.dircomercio.site_backend.entities.Persona;
 
 public interface PersonaService {

@@ -173,7 +173,8 @@ public class DenunciaServiceImpl implements DenunciaService{
     @Override
     public Denuncia actualizarEstadoDenuncia(Long id, DenunciaUpdateDTO dto) throws Exception {
         try {
-            Denuncia denuncia = denunciaRepository.findById(id).orElseThrow();
+            Denuncia denuncia = denunciaRepository.findById(id)
+            .orElseThrow(() -> new Exception("No se encontró la denuncia con el ID proporcionado"));
             denuncia.setEstado(dto.getEstado());
             String asunto = "";
             switch (denuncia.getEstado().toUpperCase()) {
@@ -191,7 +192,7 @@ public class DenunciaServiceImpl implements DenunciaService{
                     asunto = "ACTUALIZACIÓN DE DENUNCIA";
             }
             String destinarario = denuncia.getDenunciaPersonas().get(0).getPersona().getEmail();
-            String msjHtml = "<h2>Hola " + denuncia.getDenunciaPersonas().get(0).getNombreDelegado() + ",</h2>"
+            String msjHtml = "<h2>Hola " + denuncia.getDenunciaPersonas().get(0).getPersona().getNombre() + ",</h2>"
             + "<br>"
             + "<p>Su denuncia ha cambiado de estado a <b>"+asunto+"</b>.</p>"
             + "<br>"
@@ -200,7 +201,7 @@ public class DenunciaServiceImpl implements DenunciaService{
             emailService.enviarEmail(destinarario, asunto, msjHtml); 
             return denunciaRepository.save(denuncia);
         } catch (Exception e) {
-            throw new Exception("No se encontró la denuncia con el ID proporcionado");
+            throw new Exception("Hay un error al actualizar el estado de la denuncia: " + e.getMessage());
         }
     }
     // Esto ya no iría, pero lo dejo para que vean 

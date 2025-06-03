@@ -1,7 +1,5 @@
 package com.dircomercio.site_backend.controllers;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.dircomercio.site_backend.dtos.ExpedienteCreateDTO;
 import com.dircomercio.site_backend.dtos.ExpedienteCreateMinimalDTO;
+import com.dircomercio.site_backend.dtos.ExpedienteIdRespuestaDTO;
 import com.dircomercio.site_backend.entities.Expediente;
 import com.dircomercio.site_backend.services.ExpedienteService;
 
@@ -47,15 +46,15 @@ public class ExpedienteController {
     }
 
     // Obtener expediente por ID
-    @GetMapping("/{id}")
-    public ResponseEntity<Expediente> obtenerExpediente(@PathVariable Long id) {
-        Expediente expediente = expedienteService.obtenerExpedientePorId(id);
-        return ResponseEntity.ok(expediente);
+    @GetMapping("/traerExpedientePorId/{id}")
+    public ResponseEntity<ExpedienteIdRespuestaDTO> obtenerExpedientePorId(@PathVariable Long id) {
+        ExpedienteIdRespuestaDTO expediente = expedienteService.traerExpedientePorId(id);
+        return ResponseEntity.ok().body(expediente);
     }
 
     // Listar todos los expedientes
-    @GetMapping
-    public ResponseEntity<List<Expediente>> listarExpedientes() {
+    @GetMapping("/traerExpedientes")
+    public ResponseEntity<?> listarExpedientes() {
         return ResponseEntity.ok(expedienteService.listarExpedientes());
     }
 

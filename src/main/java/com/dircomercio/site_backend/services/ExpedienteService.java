@@ -3,6 +3,9 @@ package com.dircomercio.site_backend.services;
 import com.dircomercio.site_backend.dtos.ExpedienteCreateDTO;
 import com.dircomercio.site_backend.entities.Expediente;
 import com.dircomercio.site_backend.dtos.ExpedienteCreateMinimalDTO;
+import com.dircomercio.site_backend.dtos.ExpedienteIdRespuestaDTO;
+import com.dircomercio.site_backend.dtos.ExpedienteRespuestaDTO;
+
 import java.util.List;
 
 
@@ -14,9 +17,9 @@ public interface ExpedienteService {
     // Crear expediente solo si la denuncia fue aceptada
     Expediente crearExpedienteDesdeDenuncia(Long idDenuncia) throws Exception;
 
-    Expediente obtenerExpedientePorId(Long id);
+    ExpedienteIdRespuestaDTO traerExpedientePorId(Long id);
 
-    List<Expediente> listarExpedientes();
+    List<ExpedienteRespuestaDTO> listarExpedientes();
 
     Expediente actualizarExpediente(Long id, Expediente expediente);
 
