@@ -43,4 +43,7 @@ public class Expediente {
 
     @OneToMany(mappedBy = "expediente")
     private List<Audiencia> audiencia;
+
+    @OneToMany(mappedBy = "expediente")
+    private List<Pase> pases;
 }

@@ -2,6 +2,7 @@ package com.dircomercio.site_backend.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +20,7 @@ import com.dircomercio.site_backend.services.ExpedienteService;
 
 @RestController
 @RequestMapping("/expediente")
+@CrossOrigin(origins = "http://localhost:5174")
 public class ExpedienteController {
 
     @Autowired
