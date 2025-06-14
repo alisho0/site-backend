@@ -1,12 +1,18 @@
 package com.dircomercio.site_backend.implementation;
 
+import com.dircomercio.site_backend.dtos.AudienciaCreateDTO;
 import com.dircomercio.site_backend.entities.Audiencia;
+import com.dircomercio.site_backend.entities.Expediente;
+import com.dircomercio.site_backend.entities.Persona;
 import com.dircomercio.site_backend.exceptions.RecursoNoEncontradoException;
 import com.dircomercio.site_backend.repositories.AudienciaRepository;
+import com.dircomercio.site_backend.repositories.ExpedienteRepository;
+import com.dircomercio.site_backend.repositories.PersonaRepository;
 import com.dircomercio.site_backend.services.AudienciaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -14,6 +20,10 @@ public class AudienciaServiceImpl implements AudienciaService {
 
     @Autowired
     private AudienciaRepository audienciaRepository;
+    @Autowired
+    private ExpedienteRepository expedienteRepository;
+    @Autowired
+    private PersonaRepository personaRepository;
 
     @Override
     public Audiencia crearAudiencia(Audiencia audiencia) {
@@ -58,5 +68,51 @@ public class AudienciaServiceImpl implements AudienciaService {
             throw new RecursoNoEncontradoException("No se puede eliminar la audiencia con id " + id);
         }
         audienciaRepository.deleteById(id);
+    }
+
+    @Override
+    public Audiencia crearAudienciaDesdeDTO(AudienciaCreateDTO dto) {
+        Audiencia audiencia = new Audiencia();
+        audiencia.setFecha(dto.getFecha());
+        audiencia.setHora(dto.getHora());
+        audiencia.setLugar(dto.getLugar());
+        if (dto.getExpedienteId() != null) {
+            Expediente expediente = expedienteRepository.findById(dto.getExpedienteId())
+                .orElseThrow(() -> new RuntimeException("Expediente no encontrado"));
+            audiencia.setExpediente(expediente);
+        }
+        if (dto.getPersonasIds() != null) {
+            List<Persona> personas = new ArrayList<>();
+            for (Long id : dto.getPersonasIds()) {
+                Persona persona = personaRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Persona no encontrada"));
+                personas.add(persona);
+            }
+            audiencia.setPersonas(personas);
+        }
+        return audienciaRepository.save(audiencia);
+    }
+
+    @Override
+    public Audiencia actualizarAudienciaDesdeDTO(Long id, AudienciaCreateDTO dto) {
+        Audiencia audiencia = obtenerAudienciaPorId(id);
+        if (dto.getFecha() != null) audiencia.setFecha(dto.getFecha());
+        if (dto.getHora() != null) audiencia.setHora(dto.getHora());
+        if (dto.getLugar() != null) audiencia.setLugar(dto.getLugar());
+        if (dto.getExpedienteId() != null) {
+            Expediente expediente = expedienteRepository.findById(dto.getExpedienteId())
+                .orElseThrow(() -> new RuntimeException("Expediente no encontrado"));
+            audiencia.setExpediente(expediente);
+        }
+        if (dto.getPersonasIds() != null) {
+            List<Persona> personas = new ArrayList<>();
+            for (Long personaId : dto.getPersonasIds()) {
+                Persona persona = personaRepository.findById(personaId)
+                    .orElseThrow(() -> new RuntimeException("Persona no encontrada"));
+                personas.add(persona);
+            }
+            audiencia.setPersonas(personas);
+        }
+        return audienciaRepository.save(audiencia);
     }
 }
