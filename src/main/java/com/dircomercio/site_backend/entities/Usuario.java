@@ -2,7 +2,11 @@ package com.dircomercio.site_backend.entities;
 
 import java.util.List;
 
+import com.dircomercio.site_backend.auth.repository.Token;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -27,8 +31,11 @@ public class Usuario {
     private Long id;
     private String nombre;
     private String contraseña;
-    private String rol;
-    private String area;
+    @Column(unique = true)
+    private String email;
+
+    @OneToMany(mappedBy = "user" , fetch =  FetchType.LAZY)
+    private List<Token> tokens;
 
     @OneToOne
     @JoinColumn(name = "id_persona", referencedColumnName = "id")
