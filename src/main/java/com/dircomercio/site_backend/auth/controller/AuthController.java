@@ -32,18 +32,23 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<TokenResponse> authenticate(@RequestBody final LoginRequest request) {
-        try {
-            final TokenResponse token = service.login(request);
-            return ResponseEntity.ok(token);
-        } catch (Exception e) {
-            e.printStackTrace(); // Log completo en consola
-            return ResponseEntity.status(403).body(null); // Devuelve 403 explícito
-        }  
+        final TokenResponse token = service.login(request);
+        return ResponseEntity.ok(token);
     }
 
     @PostMapping("/refresh")
     public ResponseEntity<TokenResponse> refreshToken(@RequestHeader(HttpHeaders.AUTHORIZATION) final String authHeader) {
         final TokenResponse token = service.refreshToken(authHeader);
         return ResponseEntity.ok(token);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
+        try {
+            service.logout(authHeader);
+            return ResponseEntity.ok("Sesión cerrada correctamente");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al cerrar sesión: " + e.getMessage());
+        }
     }
 }

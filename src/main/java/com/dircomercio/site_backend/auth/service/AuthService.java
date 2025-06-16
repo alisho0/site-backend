@@ -113,5 +113,17 @@ public class AuthService {
         }
     }
 
-    
+    public void logout(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new IllegalArgumentException("Token no proporcionado o formato incorrecto");
+        }
+        String jwt = authHeader.substring(7);
+        Token token = tokenRepository.findByToken(jwt);
+        if (token == null) {
+            throw new IllegalArgumentException("Token no encontrado");
+        }
+        token.setRevoked(true);
+        token.setExpired(true);
+        tokenRepository.save(token);
+    }
 }

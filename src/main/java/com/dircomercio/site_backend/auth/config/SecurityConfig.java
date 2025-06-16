@@ -35,7 +35,7 @@ public class SecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable) // Deshabilitar CSRF para simplificar (considerar habilitar en producción) 
             .authorizeHttpRequests(req -> 
-            req.requestMatchers("/auth/**").permitAll()
+            req.requestMatchers("/auth/**", "/denuncia/subirDenuncia").permitAll()
             .anyRequest().authenticated())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authenticationProvider(authenticationProvider)
