@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.dircomercio.site_backend.dtos.DocumentoRespuestaDTO;
 import com.dircomercio.site_backend.entities.Denuncia;
 import com.dircomercio.site_backend.entities.Documento;
 import com.dircomercio.site_backend.repositories.DocumentoRepository;
@@ -63,6 +64,28 @@ public class DocumentoServiceImpl implements DocumentoService {
             throw new Exception(e.getMessage());
         }
         }
-        
+
+    @Override
+    public List<DocumentoRespuestaDTO> traerDocumentosPorDenuncia(Long denunciaId) throws Exception {
+        try {
+            List<Documento> docs = documentoRepository.findAllByDenunciaId(denunciaId);
+            List<DocumentoRespuestaDTO> dtos = new ArrayList<>();
+            for (Documento doc : docs) {
+                dtos.add(new DocumentoRespuestaDTO(doc.getId(), doc.getNombre(), doc.getFormato()));
+            }
+            return dtos;
+        } catch (Exception e) {
+            throw new Exception("Error al traer documentos por denuncia: " + e.getMessage());
+        }
     }
-    
+
+    @Override
+    public Documento obtenerPorId(Long id) throws Exception {
+        try {
+            return documentoRepository.findById(id)
+                .orElseThrow(() -> new Exception("No se encontró el documento con id: " + id));
+        } catch (Exception e) {
+            throw new Exception("No se encontró el pdf" + e.getMessage());
+        }
+    }
+    }

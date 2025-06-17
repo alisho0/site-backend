@@ -43,7 +43,8 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/denuncia/traerDenuncia",
                     "/denuncia/traerDenunciaPorId/{id}",
-                    "/denuncia/actualizarEstado/{id}"
+                    "/denuncia/actualizarEstado/{id}",
+                    "doc/traerPorDenuncia/{id}", "doc/traerPorId/{id}"
                 ).hasAnyRole("MESA_ENTRADA", "ADMIN")
                 // Solo admin puede registrar
                 .requestMatchers(HttpMethod.POST, "/auth/register").hasRole("ADMIN")
