@@ -20,7 +20,6 @@ import com.dircomercio.site_backend.services.ExpedienteService;
 
 @RestController
 @RequestMapping("/expediente")
-@CrossOrigin(origins = "http://localhost:5174")
 public class ExpedienteController {
 
     @Autowired
