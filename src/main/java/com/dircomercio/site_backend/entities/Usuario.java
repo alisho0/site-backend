@@ -29,9 +29,14 @@ public class Usuario {
     private String contraseña;
     private String rol;
     private String area;
+
     @OneToOne
     @JoinColumn(name = "id_persona", referencedColumnName = "id")
     private Persona persona;
+
     @OneToMany(mappedBy = "usuario")
     private List<Expediente> expedientes;
+
+    @OneToMany(mappedBy = "usuario")
+    private List<Pase> pases;
 }
