@@ -85,15 +85,14 @@ public class DenunciaController {
             throw new RuntimeException("No se pudo actualizar el estado de la denuncia.");
         }
     }
-
-    @PutMapping("/rechazarDenuncia/{id}")
-    public ResponseEntity<?> rechazarDenuncia(@PathVariable Long id, @RequestBody String motivo) {
+    
+    @PostMapping("/mandarCorreo")
+    public ResponseEntity<?> mandarCorreo(Long denunciaId, String observacion) throws Exception {
         try {
-            denunciaService.rechazarDenuncia(id, motivo);
-            return ResponseEntity.ok().body("La denuncia fue rechazada correctamente.");
+            denunciaService.notificarEstadoSinCambio(denunciaId, observacion);
+            return ResponseEntity.ok("Correo enviado correctamente");
         } catch (Exception e) {
-            throw new RuntimeException("No se pudo rechazar la denuncia.");
+            throw new Exception("Hubo un problema al mandar el correo: " + e.getMessage());
         }
     }
-    
 }

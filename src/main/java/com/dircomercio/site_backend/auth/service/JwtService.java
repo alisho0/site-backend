@@ -41,6 +41,7 @@ public class JwtService {
             .id(user.getId().toString())
             .claims(Map.of("name", user.getNombre()))
             .subject(user.getEmail())
+            .claim("rol", user.getRol() != null ? user.getRol().getNombre().toUpperCase() : "USER")
             .issuedAt(new Date(System.currentTimeMillis()))
             .expiration(new Date(System.currentTimeMillis() + expiration))
             .signWith(getSignInKey())
@@ -60,6 +61,15 @@ public class JwtService {
             .parseSignedClaims(token)
             .getPayload();
         return claims.getSubject();
+    }
+
+    public String extractRol(final String token) {
+        final Claims claims = Jwts.parser()
+            .verifyWith(getSignInKey())
+            .build()
+            .parseSignedClaims(token)
+            .getPayload();
+        return claims.get("rol", String.class);
     }
 
     public boolean isTokenValid(final String token, final Usuario user) {

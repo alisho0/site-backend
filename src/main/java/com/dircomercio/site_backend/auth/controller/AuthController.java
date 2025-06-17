@@ -2,6 +2,9 @@ package com.dircomercio.site_backend.auth.controller;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -22,7 +25,10 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<TokenResponse> register(@RequestBody final RegisterRequest request) {
         try {
-            System.out.println(request.email() + " - " + request.password() + " - " + request.name());
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            System.out.println("[DEBUG] Authorities en el método: " + auth.getAuthorities());
+            System.out.println("[LOG] Se recibió petición POST /auth/register");
+            System.out.println("[LOG] Datos recibidos: email=" + request.email() + ", name=" + request.name() + ", rol=" + request.rol());
             final TokenResponse token = service.register(request);
             return ResponseEntity.ok(token);
         } catch (Exception e) {
@@ -32,6 +38,8 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<TokenResponse> authenticate(@RequestBody final LoginRequest request) {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            System.out.println("[DEBUG] Authorities en el método: " + auth.getAuthorities());
         final TokenResponse token = service.login(request);
         return ResponseEntity.ok(token);
     }

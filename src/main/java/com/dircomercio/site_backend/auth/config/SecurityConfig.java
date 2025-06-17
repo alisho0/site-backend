@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -35,8 +36,19 @@ public class SecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable) // Deshabilitar CSRF para simplificar (considerar habilitar en producción) 
             .authorizeHttpRequests(req -> 
-            req.requestMatchers("/auth/**", "/denuncia/subirDenuncia").permitAll()
-            .anyRequest().authenticated())
+            req
+                // Endpoints públicos
+                .requestMatchers("/auth/login", "/auth/logout", "/auth/refresh", "/denuncia/subirDenuncia", "/denuncia/traerDenunciaPorExp").permitAll()
+                // Endpoints de mesa de entrada (y admin)
+                .requestMatchers(
+                    "/denuncia/traerDenuncia",
+                    "/denuncia/traerDenunciaPorId/{id}",
+                    "/denuncia/actualizarEstado/{id}"
+                ).hasAnyRole("MESA_ENTRADA", "ADMIN")
+                // Solo admin puede registrar
+                .requestMatchers(HttpMethod.POST, "/auth/register").hasRole("ADMIN")
+                // Todo lo demás solo admin
+                .anyRequest().hasRole("ADMIN"))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authenticationProvider(authenticationProvider)
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)

@@ -14,7 +14,9 @@ import com.dircomercio.site_backend.auth.controller.RegisterRequest;
 import com.dircomercio.site_backend.auth.controller.TokenResponse;
 import com.dircomercio.site_backend.auth.repository.Token;
 import com.dircomercio.site_backend.auth.repository.TokenRepository;
+import com.dircomercio.site_backend.entities.Rol;
 import com.dircomercio.site_backend.entities.Usuario;
+import com.dircomercio.site_backend.repositories.RolRepository;
 import com.dircomercio.site_backend.repositories.UsuarioRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -29,12 +31,17 @@ public class AuthService {
     private final UsuarioRepository usuarioRepository;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final RolRepository rolRepository;
 
     public TokenResponse register(RegisterRequest request) {
+        Rol rol = rolRepository.findByNombre(request.rol())
+            .orElseThrow(() -> new RuntimeException("Rol no encontrado: " + request.rol()));
+
         var user = Usuario.builder()
             .nombre(request.name())
             .email(request.email())
             .contraseña(passwordEncoder.encode(request.password()))
+            .rol(rol)
             .build();
 
         var savedUser = usuarioRepository.save(user);
