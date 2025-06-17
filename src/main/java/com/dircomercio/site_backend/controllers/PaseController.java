@@ -57,4 +57,14 @@ public class PaseController {
             return ResponseEntity.badRequest().body("No se pudo eliminar el pase: " + e.getMessage());
         }
     }
+
+    @GetMapping("/traerPasesPorExp/{id}")
+    public ResponseEntity<List<PaseRespuestaDTO>> traerPasesPorExpediente(@PathVariable Long id) {
+        return ResponseEntity.ok(paseService.traerPasesPorExpediente(id));
+    }
+
+    @PutMapping("/editarPase/{id}")
+    public ResponseEntity<PaseRespuestaDTO> editarPase(@PathVariable Long id, @RequestBody PaseCreateDTO dto) {
+        return ResponseEntity.ok(paseService.editarPase(id, dto));
+    }
 }

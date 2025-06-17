@@ -90,4 +90,56 @@ public class PaseServiceImpl implements PaseService {
         paseRepository.deleteById(id);
     }
     
+    @Override
+    public List<PaseRespuestaDTO> traerPasesPorExpediente(Long expedienteId) {
+        List<Pase> pases = paseRepository.findByExpediente_Id(expedienteId);
+        List<PaseRespuestaDTO> respuesta = new ArrayList<>();
+        for (Pase pase : pases) {
+            PaseRespuestaDTO dto = new PaseRespuestaDTO();
+            dto.setId(pase.getId());
+            dto.setAccion(pase.getAccion());
+            dto.setFechaAccion(pase.getFechaAccion());
+            dto.setAreaAccion(pase.getAreaAccion());
+            dto.setTipoTramite(pase.getTipoTramite());
+            dto.setDescripcion(pase.getDescripcion());
+            dto.setNroExpediente(pase.getExpediente() != null ? pase.getExpediente().getNro_exp() : null);
+            dto.setNombreUsuario(pase.getUsuario() != null ? pase.getUsuario().getNombre() : null);
+            respuesta.add(dto);
+        }
+        return respuesta;
+    }
+
+    @Override
+    public PaseRespuestaDTO editarPase(Long id, PaseCreateDTO dto) {
+        Pase pase = paseRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("No se encontró el pase con ID: " + id));
+        pase.setAccion(dto.getAccion());
+        pase.setFechaAccion(dto.getFechaAccion());
+        pase.setAreaAccion(dto.getAreaAccion());
+        pase.setTipoTramite(dto.getTipoTramite());
+        pase.setDescripcion(dto.getDescripcion());
+        if (dto.getExpedienteId() != null) {
+            Expediente expediente = expedienteRepository.findById(dto.getExpedienteId())
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró el expediente con ID: " + dto.getExpedienteId()));
+            pase.setExpediente(expediente);
+        }
+        if (dto.getUsuarioId() != null) {
+            Usuario usuario = usuarioRepository.findById(dto.getUsuarioId())
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró el usuario con ID: " + dto.getUsuarioId()));
+            pase.setUsuario(usuario);
+        } else {
+            pase.setUsuario(null);
+        }
+        paseRepository.save(pase);
+        PaseRespuestaDTO respuesta = new PaseRespuestaDTO();
+        respuesta.setId(pase.getId());
+        respuesta.setAccion(pase.getAccion());
+        respuesta.setFechaAccion(pase.getFechaAccion());
+        respuesta.setAreaAccion(pase.getAreaAccion());
+        respuesta.setTipoTramite(pase.getTipoTramite());
+        respuesta.setDescripcion(pase.getDescripcion());
+        respuesta.setNroExpediente(pase.getExpediente() != null ? pase.getExpediente().getNro_exp() : null);
+        respuesta.setNombreUsuario(pase.getUsuario() != null ? pase.getUsuario().getNombre() : null);
+        return respuesta;
+    }
 }

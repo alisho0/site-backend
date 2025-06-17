@@ -13,4 +13,5 @@ public interface AudienciaService {
     Audiencia actualizarAudiencia(Long id, Audiencia datosActualizados);
     Audiencia actualizarAudienciaDesdeDTO(Long id, AudienciaCreateDTO dto);
     void eliminarAudiencia(Long id);
+    List<Audiencia> traerAudienciasPorExpediente(Long expedienteId);
 }

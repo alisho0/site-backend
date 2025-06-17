@@ -115,4 +115,9 @@ public class AudienciaServiceImpl implements AudienciaService {
         }
         return audienciaRepository.save(audiencia);
     }
+
+    @Override
+    public List<Audiencia> traerAudienciasPorExpediente(Long expedienteId) {
+        return audienciaRepository.findByExpediente_Id(expedienteId);
+    }
 }

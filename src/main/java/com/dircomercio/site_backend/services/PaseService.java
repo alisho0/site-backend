@@ -10,4 +10,6 @@ public interface PaseService {
     List<PaseRespuestaDTO> traerPases();
     PaseRespuestaDTO traerPasePorId(Long id); 
     void eliminarPase(Long id);
+    List<PaseRespuestaDTO> traerPasesPorExpediente(Long expedienteId);
+    PaseRespuestaDTO editarPase(Long id, PaseCreateDTO dto);
 }

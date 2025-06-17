@@ -22,35 +22,48 @@ public class AudienciaController {
         this.audienciaService = audienciaService;
     }
 
-    @PostMapping
+    @PostMapping("/creaAudiencia{id}")
     public ResponseEntity<AudienciaDTO> crearAudiencia(@RequestBody AudienciaCreateDTO dto) {
         Audiencia nueva = audienciaService.crearAudienciaDesdeDTO(dto);
         return ResponseEntity.ok(toDTO(nueva));
     }
 
-    @GetMapping
+    @GetMapping("/obtenerAudiencias/{id}")
     public ResponseEntity<List<AudienciaDTO>> obtenerTodas() {
         List<Audiencia> audiencias = audienciaService.obtenerTodasLasAudiencias();
         List<AudienciaDTO> dtos = audiencias.stream().map(this::toDTO).collect(Collectors.toList());
         return ResponseEntity.ok(dtos);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/obtenerAudiencia/{id}")
     public ResponseEntity<AudienciaDTO> obtenerPorId(@PathVariable Long id) {
         Audiencia audiencia = audienciaService.obtenerAudienciaPorId(id);
         return ResponseEntity.ok(toDTO(audiencia));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/actualizarAudiencia{id}")
     public ResponseEntity<AudienciaDTO> actualizar(@PathVariable Long id, @RequestBody AudienciaCreateDTO dto) {
         Audiencia actualizada = audienciaService.actualizarAudienciaDesdeDTO(id, dto);
         return ResponseEntity.ok(toDTO(actualizada));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/borrarAudiencia/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         audienciaService.eliminarAudiencia(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/traeAudiPorExp/{id}")
+    public ResponseEntity<List<AudienciaDTO>> traerAudienciasPorExpediente(@PathVariable Long id) {
+        List<Audiencia> audiencias = audienciaService.traerAudienciasPorExpediente(id);
+        List<AudienciaDTO> dtos = audiencias.stream().map(this::toDTO).collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
+    }
+
+    @PutMapping("/editarAudi/{id}")
+    public ResponseEntity<AudienciaDTO> editarAudiencia(@PathVariable Long id, @RequestBody AudienciaCreateDTO dto) {
+        Audiencia actualizada = audienciaService.actualizarAudienciaDesdeDTO(id, dto);
+        return ResponseEntity.ok(toDTO(actualizada));
     }
 
     // Métodos de mapeo
