@@ -46,4 +46,8 @@ public class Usuario {
 
     @OneToMany(mappedBy = "usuario")
     private List<Pase> pases;
+
+    @OneToOne
+    @JoinColumn(name = "rol_id", referencedColumnName = "id")
+    private Rol rol;
 }
