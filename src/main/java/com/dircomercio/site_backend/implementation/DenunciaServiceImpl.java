@@ -235,7 +235,7 @@ public class DenunciaServiceImpl implements DenunciaService {
                     + "<p>Podrás ver el estado de tu denuncia en el inicio con el siguiente código: " + nroExpediente
                     + "<br>"
                     + "<p><b>Motivo:</b> " + nuevaObs + "</p>";
-            emailService.enviarEmail(destinarario, asunto, msjHtml);
+            //emailService.enviarEmail(destinarario, asunto, msjHtml);
             return denunciaRepository.save(denuncia);
         } catch (Exception e) {
             throw new Exception("Hay un error al actualizar el estado de la denuncia: " + e.getMessage());
@@ -266,7 +266,7 @@ public class DenunciaServiceImpl implements DenunciaService {
                 + "<p>El estado de su denuncia es <b>" + denuncia.getEstado() + "</b>.</p>"
                 + "<br>"
                 + "<p><b>Observación:</b> " + observacion + "</p>";
-        emailService.enviarEmail(destinarario, asunto, msjHtml);
+        //emailService.enviarEmail(destinarario, asunto, msjHtml);
     }
 
     // Esto ya no iría, pero lo dejo para que vean
