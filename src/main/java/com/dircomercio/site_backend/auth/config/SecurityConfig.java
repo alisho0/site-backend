@@ -1,6 +1,5 @@
 package com.dircomercio.site_backend.auth.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -45,7 +44,8 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/denuncia/traerDenuncia",
                     "/denuncia/traerDenunciaPorId/{id}",
-                    "/denuncia/actualizarEstado/{id}"
+                    "/denuncia/actualizarEstado/{id}",
+                    "doc/traerPorDenuncia/{id}", "doc/traerPorId/{id}"
                 ).hasAnyRole("MESA_ENTRADA", "ADMIN")
                 // Solo admin puede registrar
                 .requestMatchers(HttpMethod.POST, "/auth/register").hasRole("ADMIN")

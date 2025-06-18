@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5174")
 @RequestMapping("/denuncia")
 // http://localhost:8080/denuncia/
 public class DenunciaController {
@@ -82,7 +81,7 @@ public class DenunciaController {
             return ResponseEntity.ok().body("El estado de la denuncia fue actualizada correctamente.");
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("No se pudo actualizar el estado de la denuncia.");
+            throw new RuntimeException("No se pudo actualizar el estado de la denuncia." + e.getMessage());
         }
     }
     
