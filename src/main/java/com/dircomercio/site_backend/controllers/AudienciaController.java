@@ -74,7 +74,7 @@ public class AudienciaController {
         dto.setHora(audiencia.getHora());
         dto.setLugar(audiencia.getLugar());
         if (audiencia.getExpediente() != null) {
-            dto.setNroExp(audiencia.getExpediente().getNro_exp());
+            dto.setNroExp(audiencia.getExpediente().getNroExp());
         }
         if (audiencia.getPersonas() != null) {
             dto.setNombresPersonas(audiencia.getPersonas().stream().map(p -> p.getNombre()).collect(Collectors.toList()));

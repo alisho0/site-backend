@@ -8,4 +8,6 @@ import java.util.List;
 public interface ExpedienteRepository extends CrudRepository<Expediente, Long> {
     // Buscar expedientes por usuario asignado
     List<Expediente> findByUsuarios_Id(Long usuarioId);
+
+    int countByNroExpStartingWith(String prefijo);
 }

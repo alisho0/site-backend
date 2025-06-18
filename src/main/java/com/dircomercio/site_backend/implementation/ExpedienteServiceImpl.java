@@ -49,7 +49,7 @@ public class ExpedienteServiceImpl implements ExpedienteService {
         }
 
         Expediente expediente = new Expediente();
-        expediente.setNro_exp(dto.getNroExp());
+        expediente.setNroExp(dto.getNroExp());
         expediente.setCant_folios(dto.getCantFolios());
         //expediente.setFecha_inicio(dto.getFechaInicio());
         //expediente.setFecha_finalizacion(dto.getFechaFinalizacion());
@@ -65,7 +65,7 @@ public class ExpedienteServiceImpl implements ExpedienteService {
     public Expediente crearExpedienteDesdeMinimalDTO(ExpedienteCreateMinimalDTO dto) {
         Expediente expediente = new Expediente();
 
-        expediente.setNro_exp(dto.getNro_exp()); // 
+        expediente.setNroExp(dto.getNro_exp()); // 
         expediente.setCant_folios(null); // Se completará más adelante
         expediente.setFecha_inicio(null);
         expediente.setFecha_finalizacion(null);
@@ -88,12 +88,16 @@ public class ExpedienteServiceImpl implements ExpedienteService {
         if (!"EN PROCESO".equalsIgnoreCase(denuncia.getEstado())) {
             throw new IllegalArgumentException("La denuncia no está aceptada");
         }
-
+        String añoActual = String.valueOf(LocalDate.now().getYear());
+        String prefijo = "EXP" + "-" + añoActual + "-";
+        int cantExpedientes = expedienteRepository.countByNroExpStartingWith(prefijo);
+        String nroExpediente = prefijo + (cantExpedientes + 1);
         Expediente expediente = new Expediente();
+        
         expediente.setFecha_inicio(LocalDate.now());
-        // expediente.setDenuncia(denuncia);
-        // expediente.setNro_exp(null);
+        expediente.setNroExp(nroExpediente);
         expediente.setCant_folios("0");
+        // expediente.setDenuncia(denuncia);
         // expediente.setFecha_finalizacion(null);
         // expediente.setHipervulnerable(null);
         // expediente.setDelegacion(null);
@@ -150,7 +154,7 @@ public class ExpedienteServiceImpl implements ExpedienteService {
             respuestaDto.setFecha_inicio(expediente.getFecha_inicio());
             respuestaDto.setHipervulnerable(expediente.getHipervulnerable());
             respuestaDto.setId(expediente.getId());
-            respuestaDto.setNro_exp(expediente.getNro_exp());
+            respuestaDto.setNro_exp(expediente.getNroExp());
             respuestaDto.setDenuncia(dto);   
             return respuestaDto;
         } catch (Exception e) {
@@ -179,7 +183,7 @@ public class ExpedienteServiceImpl implements ExpedienteService {
             dto.setFecha_finalizacion(e.getFecha_finalizacion());
             dto.setFecha_inicio(e.getFecha_inicio());
             dto.setHipervulnerable(e.getHipervulnerable());
-            dto.setNro_exp(e.getNro_exp());
+            dto.setNro_exp(e.getNroExp());
             respuesta.add(dto);
         }
         return respuesta;
@@ -190,7 +194,7 @@ public class ExpedienteServiceImpl implements ExpedienteService {
         List<Usuario> usuariosAsignados = new ArrayList<>();
         List<Usuario> usuarios = expedienteActualizado.getUsuarios();
         return expedienteRepository.findById(id).map(expediente -> {
-            expediente.setNro_exp(expedienteActualizado.getNro_exp());
+            expediente.setNroExp(expedienteActualizado.getNroExp());;
             expediente.setCant_folios(expedienteActualizado.getCant_folios());
             expediente.setFecha_inicio(expedienteActualizado.getFecha_inicio());
             expediente.setFecha_finalizacion(expedienteActualizado.getFecha_finalizacion());

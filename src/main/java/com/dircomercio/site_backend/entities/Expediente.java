@@ -3,6 +3,7 @@ package com.dircomercio.site_backend.entities;
 import java.time.LocalDate;
 import java.util.List;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -29,7 +30,8 @@ public class Expediente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String nro_exp;
+    @Column(name = "nro_exp")
+    private String nroExp;
     private String cant_folios;
     private LocalDate fecha_inicio;
     private LocalDate fecha_finalizacion;

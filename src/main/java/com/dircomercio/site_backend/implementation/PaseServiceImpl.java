@@ -65,7 +65,7 @@ public class PaseServiceImpl implements PaseService {
             dto.setAreaAccion(pase.getAreaAccion());
             dto.setTipoTramite(pase.getTipoTramite());
             dto.setDescripcion(pase.getDescripcion());
-            dto.setNroExpediente(pase.getExpediente() != null ? pase.getExpediente().getNro_exp() : null);
+            dto.setNroExpediente(pase.getExpediente() != null ? pase.getExpediente().getNroExp() : null);
             dto.setNombreUsuario(pase.getUsuario() != null ? pase.getUsuario().getNombre() : null);
             respuesta.add(dto);
         }
@@ -83,7 +83,7 @@ public class PaseServiceImpl implements PaseService {
         dto.setAreaAccion(pase.getAreaAccion());
         dto.setTipoTramite(pase.getTipoTramite());
         dto.setDescripcion(pase.getDescripcion());
-        dto.setNroExpediente(pase.getExpediente() != null ? pase.getExpediente().getNro_exp() : null);
+        dto.setNroExpediente(pase.getExpediente() != null ? pase.getExpediente().getNroExp() : null);
         dto.setNombreUsuario(pase.getUsuario() != null ? pase.getUsuario().getNombre() : null);
         return dto;
     }
@@ -108,7 +108,7 @@ public class PaseServiceImpl implements PaseService {
             dto.setAreaAccion(pase.getAreaAccion());
             dto.setTipoTramite(pase.getTipoTramite());
             dto.setDescripcion(pase.getDescripcion());
-            dto.setNroExpediente(pase.getExpediente() != null ? pase.getExpediente().getNro_exp() : null);
+            dto.setNroExpediente(pase.getExpediente() != null ? pase.getExpediente().getNroExp() : null);
             dto.setNombreUsuario(pase.getUsuario() != null ? pase.getUsuario().getNombre() : null);
             respuesta.add(dto);
         }
@@ -144,7 +144,7 @@ public class PaseServiceImpl implements PaseService {
         respuesta.setAreaAccion(pase.getAreaAccion());
         respuesta.setTipoTramite(pase.getTipoTramite());
         respuesta.setDescripcion(pase.getDescripcion());
-        respuesta.setNroExpediente(pase.getExpediente() != null ? pase.getExpediente().getNro_exp() : null);
+        respuesta.setNroExpediente(pase.getExpediente() != null ? pase.getExpediente().getNroExp() : null);
         respuesta.setNombreUsuario(pase.getUsuario() != null ? pase.getUsuario().getNombre() : null);
         return respuesta;
     }
