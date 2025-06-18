@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/audiencias")
+@RequestMapping("audiencias")
 public class AudienciaController {
 
     @Autowired
@@ -22,13 +22,13 @@ public class AudienciaController {
         this.audienciaService = audienciaService;
     }
 
-    @PostMapping("/creaAudiencia{id}")
+    @PostMapping("/creaAudiencia")
     public ResponseEntity<AudienciaDTO> crearAudiencia(@RequestBody AudienciaCreateDTO dto) {
         Audiencia nueva = audienciaService.crearAudienciaDesdeDTO(dto);
         return ResponseEntity.ok(toDTO(nueva));
     }
 
-    @GetMapping("/obtenerAudiencias/{id}")
+    @GetMapping("/obtenerAudiencias")
     public ResponseEntity<List<AudienciaDTO>> obtenerTodas() {
         List<Audiencia> audiencias = audienciaService.obtenerTodasLasAudiencias();
         List<AudienciaDTO> dtos = audiencias.stream().map(this::toDTO).collect(Collectors.toList());
