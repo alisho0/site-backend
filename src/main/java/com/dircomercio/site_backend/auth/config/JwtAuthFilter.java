@@ -40,7 +40,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
-        System.out.println("[LOG] JwtAuthFilter: request a " + request.getMethod() + " " + request.getRequestURI());
+        //System.out.println("[LOG] JwtAuthFilter: request a " + request.getMethod() + " " + request.getRequestURI());
         // Solo saltar el filtro para los endpoints realmente públicos
         String path = request.getServletPath();
         if (path.equals("/auth/login") || path.equals("/auth/logout") || path.equals("/auth/refresh")) {

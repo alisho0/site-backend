@@ -3,9 +3,11 @@ package com.dircomercio.site_backend.controllers;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dircomercio.site_backend.dtos.UsuarioDTO;
 import com.dircomercio.site_backend.entities.Usuario;
 import com.dircomercio.site_backend.repositories.UsuarioRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,13 +23,19 @@ public class UsuarioController {
     UsuarioRepository usuarioRepository;
 
     @GetMapping("/traerUsuarios")
-    public List<Usuario> traerUsuarios() {
+    public List<UsuarioDTO> traerUsuarios() {
+
         List<Usuario> usuarios = (List<Usuario>) usuarioRepository.findAll();
+        List<UsuarioDTO> usuariosDTO = new ArrayList<>();
         for (Usuario usuario : usuarios) {
-            System.out.println("name: "+usuario.getEmail());
-            System.out.println("id: "+usuario.getId());
+            UsuarioDTO usu = UsuarioDTO.builder()
+                .id(usuario.getId())
+                .email(usuario.getEmail())
+                .nombreUsuario(usuario.getNombre())
+                .build();
+            usuariosDTO.add(usu);
         }
-        return (List<Usuario>) usuarioRepository.findAll();
+        return usuariosDTO;
     }
     
 }

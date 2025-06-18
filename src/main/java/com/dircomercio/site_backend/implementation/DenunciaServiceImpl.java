@@ -1,11 +1,13 @@
 package com.dircomercio.site_backend.implementation;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,6 +22,7 @@ import com.dircomercio.site_backend.entities.DenunciaPersona;
 import com.dircomercio.site_backend.entities.Persona;
 import com.dircomercio.site_backend.repositories.DenunciaEstadoRepository;
 import com.dircomercio.site_backend.repositories.DenunciaRepository;
+import com.dircomercio.site_backend.repositories.ExpedienteRepository;
 import com.dircomercio.site_backend.services.DenunciaPersonaService;
 import com.dircomercio.site_backend.services.DenunciaService;
 import com.dircomercio.site_backend.services.DocumentoService;
@@ -51,6 +54,9 @@ public class DenunciaServiceImpl implements DenunciaService {
 
     @Autowired
     DenunciaEstadoRepository denunciaEstadoRepository;
+
+    @Autowired
+    ExpedienteRepository expedienteRepository;
 
     @Override
     public void guardarDenuncia(DenunciaDTO denunciaDTO, List<MultipartFile> files) {
@@ -186,7 +192,7 @@ public class DenunciaServiceImpl implements DenunciaService {
             List<DenunciaEstado> historial = denunciaEstadoRepository.findByDenunciaOrderByFechaAsc(denuncia);
             String nuevoEstado = dto.getEstado();
             String nuevaObs = dto.getMotivo();
-
+            System.out.println("Entrando a actualizarEstadoDenuncia, usuario autenticado: " + SecurityContextHolder.getContext().getAuthentication());
             // Validación de transición robusta
             boolean tuvoRechazado = historial.stream().anyMatch(
                     e -> "RECHAZADA".equalsIgnoreCase(e.getEstado()) || "NO ADMITIDA".equalsIgnoreCase(e.getEstado()));
@@ -209,6 +215,10 @@ public class DenunciaServiceImpl implements DenunciaService {
             }
 
             denuncia.setEstado(nuevoEstado);
+            String añoActual = String.valueOf(LocalDate.now().getYear());
+            String prefijo = "EXP" + "-" + añoActual + "-";
+            int cantExpedientes = expedienteRepository.countByNroExpStartingWith(prefijo);
+            String nroExpediente = prefijo + (cantExpedientes + 1);
             DenunciaEstado nuevo = DenunciaEstado.builder()
                     .denuncia(denuncia)
                     .estado(nuevoEstado)
@@ -222,6 +232,7 @@ public class DenunciaServiceImpl implements DenunciaService {
             String msjHtml = "<h2>Hola " + denuncia.getDenunciaPersonas().get(0).getPersona().getNombre() + ",</h2>"
                     + "<br>"
                     + "<p>Su denuncia ha cambiado de estado a <b>" + nuevoEstado + "</b>.</p>"
+                    + "<p>Podrás ver el estado de tu denuncia en el inicio con el siguiente código: " + nroExpediente
                     + "<br>"
                     + "<p><b>Motivo:</b> " + nuevaObs + "</p>";
             emailService.enviarEmail(destinarario, asunto, msjHtml);

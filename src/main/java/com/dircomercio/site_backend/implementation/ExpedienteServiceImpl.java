@@ -85,9 +85,9 @@ public class ExpedienteServiceImpl implements ExpedienteService {
         }
 
         Denuncia denuncia = denunciaOpt.get();
-        if (!"EN PROCESO".equalsIgnoreCase(denuncia.getEstado())) {
-            throw new IllegalArgumentException("La denuncia no está aceptada");
-        }
+        // if (!"EN PROCESO".equalsIgnoreCase(denuncia.getEstado())) {
+        //     throw new IllegalArgumentException("La denuncia no está aceptada");
+        // }
         String añoActual = String.valueOf(LocalDate.now().getYear());
         String prefijo = "EXP" + "-" + añoActual + "-";
         int cantExpedientes = expedienteRepository.countByNroExpStartingWith(prefijo);
@@ -220,6 +220,7 @@ public class ExpedienteServiceImpl implements ExpedienteService {
     // Permite a PreAuthorize verificar si el usuario puede acceder a un expediente
     public boolean usuarioPuedeAcceder(Long expedienteId) {
         var usuario = authUtil.getUsuarioAutenticado();
+        if (usuario == null) return false;
         var expediente = expedienteRepository.findById(expedienteId).orElse(null);
         boolean esAdmin = usuario.getRol() != null && usuario.getRol().getNombre().equalsIgnoreCase("ADMIN");
         return expediente != null && (esAdmin || expediente.getUsuarios().contains(usuario));

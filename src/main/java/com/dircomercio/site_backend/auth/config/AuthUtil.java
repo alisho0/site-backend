@@ -22,6 +22,6 @@ public class AuthUtil {
         }
         String email = authentication.getName();
         Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
-        return usuarioOpt.orElse(null);
+        return usuarioOpt.orElseThrow();
     }
 }

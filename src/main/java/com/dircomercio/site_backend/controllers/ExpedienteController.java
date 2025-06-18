@@ -48,7 +48,7 @@ public class ExpedienteController {
     }
 
     // Obtener expediente por ID
-    @PreAuthorize("@expedienteServiceImpl.usuarioPuedeAcceder(#id)")
+    //@PreAuthorize("@expedienteServiceImpl.usuarioPuedeAcceder(#id)")
     @GetMapping("/traerExpedientePorId/{id}")
     public ResponseEntity<ExpedienteIdRespuestaDTO> obtenerExpedientePorId(@PathVariable Long id) {
         ExpedienteIdRespuestaDTO expediente = expedienteService.traerExpedientePorId(id);
