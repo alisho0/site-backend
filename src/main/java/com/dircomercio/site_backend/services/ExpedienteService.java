@@ -5,6 +5,7 @@ import com.dircomercio.site_backend.entities.Expediente;
 import com.dircomercio.site_backend.dtos.ExpedienteCreateMinimalDTO;
 import com.dircomercio.site_backend.dtos.ExpedienteIdRespuestaDTO;
 import com.dircomercio.site_backend.dtos.ExpedienteRespuestaDTO;
+import com.dircomercio.site_backend.dtos.ExpedienteUpdateDTO;
 
 import java.util.List;
 
@@ -21,7 +22,7 @@ public interface ExpedienteService {
 
     List<ExpedienteRespuestaDTO> listarExpedientes();
 
-    Expediente actualizarExpediente(Long id, Expediente expediente);
+    Expediente actualizarExpediente(Long id, ExpedienteUpdateDTO dto);
 
     void eliminarExpediente(Long id);
 

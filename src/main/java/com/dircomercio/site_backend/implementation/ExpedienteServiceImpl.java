@@ -14,6 +14,7 @@ import com.dircomercio.site_backend.dtos.ExpedienteCreateDTO;
 import com.dircomercio.site_backend.dtos.ExpedienteCreateMinimalDTO;
 import com.dircomercio.site_backend.dtos.ExpedienteIdRespuestaDTO;
 import com.dircomercio.site_backend.dtos.ExpedienteRespuestaDTO;
+import com.dircomercio.site_backend.dtos.ExpedienteUpdateDTO;
 import com.dircomercio.site_backend.dtos.PersonaConRolDTO;
 import com.dircomercio.site_backend.entities.Denuncia;
 import com.dircomercio.site_backend.entities.DenunciaPersona;
@@ -21,6 +22,7 @@ import com.dircomercio.site_backend.entities.Expediente;
 import com.dircomercio.site_backend.entities.Usuario;
 import com.dircomercio.site_backend.repositories.DenunciaRepository;
 import com.dircomercio.site_backend.repositories.ExpedienteRepository;
+import com.dircomercio.site_backend.repositories.UsuarioRepository;
 import com.dircomercio.site_backend.services.ExpedienteService;
 
 @Service
@@ -34,6 +36,9 @@ public class ExpedienteServiceImpl implements ExpedienteService {
 
     @Autowired
     private AuthUtil authUtil;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     // Crear expediente desde DTO completo
     @Override
@@ -190,23 +195,21 @@ public class ExpedienteServiceImpl implements ExpedienteService {
     }
 
     @Override
-    public Expediente actualizarExpediente(Long id, Expediente expedienteActualizado) {
-        List<Usuario> usuariosAsignados = new ArrayList<>();
-        List<Usuario> usuarios = expedienteActualizado.getUsuarios();
+    public Expediente actualizarExpediente(Long id, ExpedienteUpdateDTO dto) {
         return expedienteRepository.findById(id).map(expediente -> {
-            expediente.setNroExp(expedienteActualizado.getNroExp());;
-            expediente.setCant_folios(expedienteActualizado.getCant_folios());
-            expediente.setFecha_inicio(expedienteActualizado.getFecha_inicio());
-            expediente.setFecha_finalizacion(expedienteActualizado.getFecha_finalizacion());
-            expediente.setHipervulnerable(expedienteActualizado.getHipervulnerable());
-            expediente.setDelegacion(expedienteActualizado.getDelegacion());
-            expediente.setDenuncia(expedienteActualizado.getDenuncia());
-            for (Usuario usuario : usuarios) {
-                usuariosAsignados.add(usuario);
-            }
+            expediente.setNroExp(dto.getNroExp());
+            expediente.setCant_folios(dto.getCant_folios());
+            expediente.setFecha_inicio(dto.getFecha_inicio());
+            expediente.setFecha_finalizacion(dto.getFecha_finalizacion());
+            expediente.setHipervulnerable(dto.getHipervulnerable());
+            expediente.setDelegacion(dto.getDelegacion());
+
+        // Buscar usuarios por ID
+            List<Usuario> usuarios = (List<Usuario>) usuarioRepository.findAllById(dto.getUsuarios());
             expediente.setUsuarios(usuarios);
+
             return expedienteRepository.save(expediente);
-        }).orElseThrow(() -> new IllegalArgumentException("Expediente no encontrado con ID: " + id));
+    }).orElseThrow(() -> new IllegalArgumentException("Expediente no encontrado con ID: " + id));
     }
 
     @Override

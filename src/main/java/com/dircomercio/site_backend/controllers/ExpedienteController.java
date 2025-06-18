@@ -19,6 +19,7 @@ import com.dircomercio.site_backend.dtos.DenunciaEstadoRespuestaDTO;
 import com.dircomercio.site_backend.dtos.ExpedienteCreateDTO;
 import com.dircomercio.site_backend.dtos.ExpedienteCreateMinimalDTO;
 import com.dircomercio.site_backend.dtos.ExpedienteIdRespuestaDTO;
+import com.dircomercio.site_backend.dtos.ExpedienteUpdateDTO;
 import com.dircomercio.site_backend.entities.DenunciaEstado;
 import com.dircomercio.site_backend.entities.Expediente;
 import com.dircomercio.site_backend.repositories.DenunciaEstadoRepository;
@@ -69,13 +70,6 @@ public class ExpedienteController {
         return ResponseEntity.ok(expedienteService.listarExpedientes());
     }
 
-    // Actualizar expediente
-    @PutMapping("/{id}")
-    public ResponseEntity<Expediente> actualizarExpediente(@PathVariable Long id, @RequestBody Expediente expedienteActualizado) {
-        Expediente actualizado = expedienteService.actualizarExpediente(id, expedienteActualizado);
-        return ResponseEntity.ok(actualizado);
-    }
-
     // Eliminar expediente
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarExpediente(@PathVariable Long id) {
@@ -84,9 +78,9 @@ public class ExpedienteController {
     }
 
     // Editar expediente (solo si el usuario tiene acceso)
-    @PutMapping("/editar/{id}")
-    public ResponseEntity<Expediente> editarExpediente(@PathVariable Long id, @RequestBody Expediente expedienteActualizado) {
-        Expediente actualizado = expedienteService.actualizarExpediente(id, expedienteActualizado);
+    @PutMapping("/editarExpediente/{id}")
+    public ResponseEntity<Expediente> editarExpediente(@PathVariable Long id, @RequestBody ExpedienteUpdateDTO dto) {
+        Expediente actualizado = expedienteService.actualizarExpediente(id, dto);
         return ResponseEntity.ok(actualizado);
     }
 
