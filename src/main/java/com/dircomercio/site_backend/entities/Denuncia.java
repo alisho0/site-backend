@@ -44,5 +44,8 @@ public class Denuncia {
     @JoinColumn(name = "expediente_id", referencedColumnName = "id", nullable = true)
     private Expediente expediente;
 
+    @OneToMany(mappedBy = "denuncia", cascade = CascadeType.ALL)
+    private List<DenunciaEstado> historialEstados;
+
     
 }

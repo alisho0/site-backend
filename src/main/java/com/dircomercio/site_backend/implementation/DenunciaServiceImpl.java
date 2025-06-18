@@ -1,5 +1,6 @@
 package com.dircomercio.site_backend.implementation;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,8 +15,10 @@ import com.dircomercio.site_backend.dtos.DenunciaUpdateDTO;
 import com.dircomercio.site_backend.dtos.PersonaConRolDTO;
 import com.dircomercio.site_backend.dtos.PersonaRolDTO;
 import com.dircomercio.site_backend.entities.Denuncia;
+import com.dircomercio.site_backend.entities.DenunciaEstado;
 import com.dircomercio.site_backend.entities.DenunciaPersona;
 import com.dircomercio.site_backend.entities.Persona;
+import com.dircomercio.site_backend.repositories.DenunciaEstadoRepository;
 import com.dircomercio.site_backend.repositories.DenunciaRepository;
 import com.dircomercio.site_backend.services.DenunciaPersonaService;
 import com.dircomercio.site_backend.services.DenunciaService;
@@ -24,10 +27,8 @@ import com.dircomercio.site_backend.services.EmailService;
 import com.dircomercio.site_backend.services.ExpedienteService;
 import com.dircomercio.site_backend.services.PersonaService;
 
-
-
 @Service
-public class DenunciaServiceImpl implements DenunciaService{
+public class DenunciaServiceImpl implements DenunciaService {
 
     @Autowired
     DenunciaRepository denunciaRepository;
@@ -43,17 +44,23 @@ public class DenunciaServiceImpl implements DenunciaService{
 
     @Autowired
     EmailService emailService;
-    // agrego esto mostrar a ale, lo que hice aqui primero fue  inyectar el servicio de expediente
+    // agrego esto mostrar a ale, lo que hice aqui primero fue inyectar el servicio
+    // de expediente
     @Autowired
     ExpedienteService expedienteService;
 
+    @Autowired
+    DenunciaEstadoRepository denunciaEstadoRepository;
 
     @Override
     public void guardarDenuncia(DenunciaDTO denunciaDTO, List<MultipartFile> files) {
 
-        if (denunciaDTO == null) throw new IllegalArgumentException("La denuncia no puede ser nula.");
-        if (files == null) throw new IllegalArgumentException("Los archivos no pueden ser nulos.");
-        if (denunciaDTO.getPersonas() == null) throw new IllegalArgumentException("Las personas no deben ser nulas.");
+        if (denunciaDTO == null)
+            throw new IllegalArgumentException("La denuncia no puede ser nula.");
+        if (files == null)
+            throw new IllegalArgumentException("Los archivos no pueden ser nulos.");
+        if (denunciaDTO.getPersonas() == null)
+            throw new IllegalArgumentException("Las personas no deben ser nulas.");
 
         try {
             // Aquí se crea la denuncia
@@ -174,50 +181,100 @@ public class DenunciaServiceImpl implements DenunciaService{
     public Denuncia actualizarEstadoDenuncia(Long id, DenunciaUpdateDTO dto) throws Exception {
         try {
             Denuncia denuncia = denunciaRepository.findById(id)
-            .orElseThrow(() -> new Exception("No se encontró la denuncia con el ID proporcionado"));
-            denuncia.setEstado(dto.getEstado());
-            String asunto = "";
-            switch (denuncia.getEstado().toUpperCase()) {
-                case "EN PROCESO":
-                    asunto = "DENUNCIA EN PROCESO";
-                    expedienteService.crearExpedienteDesdeDenuncia(denuncia.getId());
-                    break;
-                case "NO ADMITIDA":
-                    asunto = "DENUNCIA NO ADMITIDA";
-                    break;
-                case "RECHAZADA":
-                    asunto = "DENUNCIA RECHAZADA";
-                    break;
-                default:
-                    asunto = "ACTUALIZACIÓN DE DENUNCIA";
+                    .orElseThrow(() -> new Exception("No se encontró la denuncia con el ID proporcionado"));
+
+            List<DenunciaEstado> historial = denunciaEstadoRepository.findByDenunciaOrderByFechaAsc(denuncia);
+            String nuevoEstado = dto.getEstado();
+            String nuevaObs = dto.getMotivo();
+
+            // Validación de transición robusta
+            boolean tuvoRechazado = historial.stream().anyMatch(
+                    e -> "RECHAZADA".equalsIgnoreCase(e.getEstado()) || "NO ADMITIDA".equalsIgnoreCase(e.getEstado()));
+            boolean tuvoProceso = historial.stream().anyMatch(e -> "EN PROCESO".equalsIgnoreCase(e.getEstado()));
+            String ultimoEstado = historial.isEmpty() ? null : historial.get(historial.size() - 1).getEstado();
+            String ultimaObs = historial.isEmpty() ? null : historial.get(historial.size() - 1).getObservacion();
+
+            if (tuvoRechazado && "EN PROCESO".equalsIgnoreCase(nuevoEstado)) {
+                throw new Exception(
+                        "No se puede cambiar el estado a 'EN PROCESO' si la denuncia ya fue rechazada o no admitida.");
             }
+            if (!tuvoProceso && "EN PROCESO".equalsIgnoreCase(nuevoEstado)) {
+                expedienteService.crearExpedienteDesdeDenuncia(denuncia.getId());
+            }
+            // Evitar guardar el mismo estado dos veces seguidas salvo que la observación
+            // sea diferente
+            if (nuevoEstado.equalsIgnoreCase(ultimoEstado) && (nuevaObs == null || nuevaObs.equals(ultimaObs))) {
+                throw new Exception(
+                        "El estado ya es '" + nuevoEstado + "' y la observación no cambió. No se registra duplicado.");
+            }
+
+            denuncia.setEstado(nuevoEstado);
+            DenunciaEstado nuevo = DenunciaEstado.builder()
+                    .denuncia(denuncia)
+                    .estado(nuevoEstado)
+                    .fecha(LocalDateTime.now())
+                    .observacion(nuevaObs)
+                    .build();
+            denunciaEstadoRepository.save(nuevo);
+
+            String asunto = "Estado de denuncia: " + nuevoEstado;
             String destinarario = denuncia.getDenunciaPersonas().get(0).getPersona().getEmail();
             String msjHtml = "<h2>Hola " + denuncia.getDenunciaPersonas().get(0).getPersona().getNombre() + ",</h2>"
-            + "<br>"
-            + "<p>Su denuncia ha cambiado de estado a <b>"+asunto+"</b>.</p>"
-            + "<br>"
-            + "<p><b>Motivo:</b> " + dto.getMotivo() + "</p>";
-            // Este emailService no iría comentado, pero por el momento lo dejo comentado
-            emailService.enviarEmail(destinarario, asunto, msjHtml); 
+                    + "<br>"
+                    + "<p>Su denuncia ha cambiado de estado a <b>" + nuevoEstado + "</b>.</p>"
+                    + "<br>"
+                    + "<p><b>Motivo:</b> " + nuevaObs + "</p>";
+            emailService.enviarEmail(destinarario, asunto, msjHtml);
             return denunciaRepository.save(denuncia);
         } catch (Exception e) {
             throw new Exception("Hay un error al actualizar el estado de la denuncia: " + e.getMessage());
         }
     }
-    // Esto ya no iría, pero lo dejo para que vean 
+
+    // Enviar mail sin cambiar el estado, pero registrando en historial si la
+    // observación es diferente
+    public void notificarEstadoSinCambio(Long denunciaId, String observacion) throws Exception {
+        Denuncia denuncia = denunciaRepository.findById(denunciaId)
+                .orElseThrow(() -> new Exception("No se encontró la denuncia con el ID proporcionado"));
+        List<DenunciaEstado> historial = denunciaEstadoRepository.findByDenunciaOrderByFechaAsc(denuncia);
+        String ultimoEstado = historial.isEmpty() ? null : historial.get(historial.size() - 1).getEstado();
+        String ultimaObs = historial.isEmpty() ? null : historial.get(historial.size() - 1).getObservacion();
+        if (observacion != null && !observacion.equals(ultimaObs)) {
+            DenunciaEstado nuevo = DenunciaEstado.builder()
+                    .denuncia(denuncia)
+                    .estado(ultimoEstado)
+                    .fecha(LocalDateTime.now())
+                    .observacion(observacion)
+                    .build();
+            denunciaEstadoRepository.save(nuevo);
+        }
+        String asunto = "Estado de denuncia: " + denuncia.getEstado();
+        String destinarario = denuncia.getDenunciaPersonas().get(0).getPersona().getEmail();
+        String msjHtml = "<h2>Hola " + denuncia.getDenunciaPersonas().get(0).getPersona().getNombre() + ",</h2>"
+                + "<br>"
+                + "<p>El estado de su denuncia es <b>" + denuncia.getEstado() + "</b>.</p>"
+                + "<br>"
+                + "<p><b>Observación:</b> " + observacion + "</p>";
+        emailService.enviarEmail(destinarario, asunto, msjHtml);
+    }
+
+    // Esto ya no iría, pero lo dejo para que vean
     @Override
     public void rechazarDenuncia(Long id, String motivoRechazo) throws Exception {
-        /* try {
-            Denuncia denuncia = denunciaRepository.findById(id).orElseThrow();
-            denuncia.setEstado("RECHAZADA");
-            denunciaRepository.save(denuncia);
-
-            // Mandar un email al denunciante informando del rechazo
-            String destinarario = denuncia.getDenunciaPersonas().get(0).getPersona().getEmail();
-            String asunto = "Denuncia Rechazada";
-            emailService.enviarEmail(destinarario, asunto, motivoRechazo);
-        } catch (Exception e) {
-            throw new Exception("No se encontró la denuncia con el ID proporcionado");
-        } */
-    } 
+        /*
+         * try {
+         * Denuncia denuncia = denunciaRepository.findById(id).orElseThrow();
+         * denuncia.setEstado("RECHAZADA");
+         * denunciaRepository.save(denuncia);
+         * 
+         * // Mandar un email al denunciante informando del rechazo
+         * String destinarario =
+         * denuncia.getDenunciaPersonas().get(0).getPersona().getEmail();
+         * String asunto = "Denuncia Rechazada";
+         * emailService.enviarEmail(destinarario, asunto, motivoRechazo);
+         * } catch (Exception e) {
+         * throw new Exception("No se encontró la denuncia con el ID proporcionado");
+         * }
+         */
+    }
 }
