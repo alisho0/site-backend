@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dircomercio.site_backend.auth.config.AuthUtil;
 import com.dircomercio.site_backend.dtos.DenunciaRespuestaDTO;
 import com.dircomercio.site_backend.dtos.ExpedienteCreateDTO;
 import com.dircomercio.site_backend.dtos.ExpedienteCreateMinimalDTO;
@@ -17,6 +18,7 @@ import com.dircomercio.site_backend.dtos.PersonaConRolDTO;
 import com.dircomercio.site_backend.entities.Denuncia;
 import com.dircomercio.site_backend.entities.DenunciaPersona;
 import com.dircomercio.site_backend.entities.Expediente;
+import com.dircomercio.site_backend.entities.Usuario;
 import com.dircomercio.site_backend.repositories.DenunciaRepository;
 import com.dircomercio.site_backend.repositories.ExpedienteRepository;
 import com.dircomercio.site_backend.services.ExpedienteService;
@@ -29,6 +31,9 @@ public class ExpedienteServiceImpl implements ExpedienteService {
 
     @Autowired
     private DenunciaRepository denunciaRepository;
+
+    @Autowired
+    private AuthUtil authUtil;
 
     // Crear expediente desde DTO completo
     @Override
@@ -157,9 +162,15 @@ public class ExpedienteServiceImpl implements ExpedienteService {
 
     @Override
     public List<ExpedienteRespuestaDTO> listarExpedientes() {
-        List<Expediente> expedientes = (List<Expediente>) expedienteRepository.findAll();
+        var usuario = authUtil.getUsuarioAutenticado();
+        boolean esAdmin = usuario.getRol() != null && usuario.getRol().getNombre().equalsIgnoreCase("ADMIN");
+        List<Expediente> expedientes;
+        if (esAdmin) {
+            expedientes = (List<Expediente>) expedienteRepository.findAll();
+        } else {
+            expedientes = expedienteRepository.findByUsuarios_Id(usuario.getId());
+        }
         List<ExpedienteRespuestaDTO> respuesta = new ArrayList<>();
-
         for (Expediente e : expedientes) {
             ExpedienteRespuestaDTO dto = new ExpedienteRespuestaDTO();
             dto.setId(e.getId());
@@ -176,6 +187,8 @@ public class ExpedienteServiceImpl implements ExpedienteService {
 
     @Override
     public Expediente actualizarExpediente(Long id, Expediente expedienteActualizado) {
+        List<Usuario> usuariosAsignados = new ArrayList<>();
+        List<Usuario> usuarios = expedienteActualizado.getUsuarios();
         return expedienteRepository.findById(id).map(expediente -> {
             expediente.setNro_exp(expedienteActualizado.getNro_exp());
             expediente.setCant_folios(expedienteActualizado.getCant_folios());
@@ -184,6 +197,10 @@ public class ExpedienteServiceImpl implements ExpedienteService {
             expediente.setHipervulnerable(expedienteActualizado.getHipervulnerable());
             expediente.setDelegacion(expedienteActualizado.getDelegacion());
             expediente.setDenuncia(expedienteActualizado.getDenuncia());
+            for (Usuario usuario : usuarios) {
+                usuariosAsignados.add(usuario);
+            }
+            expediente.setUsuarios(usuarios);
             return expedienteRepository.save(expediente);
         }).orElseThrow(() -> new IllegalArgumentException("Expediente no encontrado con ID: " + id));
     }
@@ -194,5 +211,13 @@ public class ExpedienteServiceImpl implements ExpedienteService {
             throw new IllegalArgumentException("Expediente no encontrado con ID: " + id);
         }
         expedienteRepository.deleteById(id);
+    }
+
+    // Permite a PreAuthorize verificar si el usuario puede acceder a un expediente
+    public boolean usuarioPuedeAcceder(Long expedienteId) {
+        var usuario = authUtil.getUsuarioAutenticado();
+        var expediente = expedienteRepository.findById(expedienteId).orElse(null);
+        boolean esAdmin = usuario.getRol() != null && usuario.getRol().getNombre().equalsIgnoreCase("ADMIN");
+        return expediente != null && (esAdmin || expediente.getUsuarios().contains(usuario));
     }
 }

@@ -2,6 +2,7 @@ package com.dircomercio.site_backend.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,6 +48,7 @@ public class ExpedienteController {
     }
 
     // Obtener expediente por ID
+    @PreAuthorize("@expedienteServiceImpl.usuarioPuedeAcceder(#id)")
     @GetMapping("/traerExpedientePorId/{id}")
     public ResponseEntity<ExpedienteIdRespuestaDTO> obtenerExpedientePorId(@PathVariable Long id) {
         ExpedienteIdRespuestaDTO expediente = expedienteService.traerExpedientePorId(id);
@@ -71,6 +73,13 @@ public class ExpedienteController {
     public ResponseEntity<Void> eliminarExpediente(@PathVariable Long id) {
         expedienteService.eliminarExpediente(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // Editar expediente (solo si el usuario tiene acceso)
+    @PutMapping("/editar/{id}")
+    public ResponseEntity<Expediente> editarExpediente(@PathVariable Long id, @RequestBody Expediente expedienteActualizado) {
+        Expediente actualizado = expedienteService.actualizarExpediente(id, expedienteActualizado);
+        return ResponseEntity.ok(actualizado);
     }
 }
 

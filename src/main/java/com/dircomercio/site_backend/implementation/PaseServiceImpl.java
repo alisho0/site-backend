@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dircomercio.site_backend.auth.config.AuthUtil;
 import com.dircomercio.site_backend.dtos.PaseCreateDTO;
 import com.dircomercio.site_backend.dtos.PaseRespuestaDTO;
 import com.dircomercio.site_backend.entities.Expediente;
@@ -25,6 +26,11 @@ public class PaseServiceImpl implements PaseService {
     private ExpedienteRepository expedienteRepository;
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private AuthUtil authUtil;
+
+    public void usuarioTienePermisos(){};
 
     public void crearPase(PaseCreateDTO dto) {
         Pase pase = new Pase();

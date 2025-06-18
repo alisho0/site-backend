@@ -34,11 +34,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            .cors()
+            .and()
             .csrf(AbstractHttpConfigurer::disable) // Deshabilitar CSRF para simplificar (considerar habilitar en producción) 
             .authorizeHttpRequests(req -> 
             req
                 // Endpoints públicos
-                .requestMatchers("/auth/login", "/auth/logout", "/auth/refresh", "/denuncia/subirDenuncia", "/denuncia/traerDenunciaPorExp").permitAll()
+                .requestMatchers(/* "/rol/**", "/auth/register",*/ "/auth/login", "/auth/logout", "/auth/refresh", "/denuncia/subirDenuncia", "/denuncia/traerDenunciaPorExp").permitAll()
                 // Endpoints de mesa de entrada (y admin)
                 .requestMatchers(
                     "/denuncia/traerDenuncia",

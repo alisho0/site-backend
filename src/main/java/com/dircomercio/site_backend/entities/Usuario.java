@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -42,8 +43,11 @@ public class Usuario {
     @JoinColumn(name = "id_persona", referencedColumnName = "id")
     private Persona persona;
 
-    @OneToMany(mappedBy = "usuario")
+    @ManyToMany(mappedBy = "usuarios")
     private List<Expediente> expedientes;
+
+    // @OneToMany(mappedBy = "usuario")
+    // private List<Expediente> expedientesAsignadosLegacy; // Si quieres mantener la relación antigua
 
     @OneToMany(mappedBy = "usuario")
     private List<Pase> pases;

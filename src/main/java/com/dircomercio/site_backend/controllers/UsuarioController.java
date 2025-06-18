@@ -22,6 +22,11 @@ public class UsuarioController {
 
     @GetMapping("/traerUsuarios")
     public List<Usuario> traerUsuarios() {
+        List<Usuario> usuarios = (List<Usuario>) usuarioRepository.findAll();
+        for (Usuario usuario : usuarios) {
+            System.out.println("name: "+usuario.getEmail());
+            System.out.println("id: "+usuario.getId());
+        }
         return (List<Usuario>) usuarioRepository.findAll();
     }
     

@@ -12,6 +12,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.JoinTable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -46,4 +48,12 @@ public class Expediente {
 
     @OneToMany(mappedBy = "expediente")
     private List<Pase> pases;
+
+    @ManyToMany
+    @JoinTable(
+        name = "expediente_usuario",
+        joinColumns = @JoinColumn(name = "expediente_id"),
+        inverseJoinColumns = @JoinColumn(name = "usuario_id")
+    )
+    private List<Usuario> usuarios;
 }
