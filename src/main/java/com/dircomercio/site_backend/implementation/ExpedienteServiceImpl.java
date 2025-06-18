@@ -80,9 +80,9 @@ public class ExpedienteServiceImpl implements ExpedienteService {
         }
 
         Denuncia denuncia = denunciaOpt.get();
-        if (!"EN PROCESO".equalsIgnoreCase(denuncia.getEstado())) {
-            throw new IllegalArgumentException("La denuncia no está aceptada");
-        }
+        // if (!"EN PROCESO".equalsIgnoreCase(denuncia.getEstado())) {
+        //     throw new IllegalArgumentException("La denuncia no está aceptada");
+        // }
 
         Expediente expediente = new Expediente();
         expediente.setFecha_inicio(LocalDate.now());
