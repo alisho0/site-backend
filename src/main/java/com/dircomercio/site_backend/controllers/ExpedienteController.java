@@ -1,5 +1,8 @@
 package com.dircomercio.site_backend.controllers;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,10 +16,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dircomercio.site_backend.dtos.DenunciaEstadoRespuestaDTO;
 import com.dircomercio.site_backend.dtos.ExpedienteCreateDTO;
 import com.dircomercio.site_backend.dtos.ExpedienteCreateMinimalDTO;
 import com.dircomercio.site_backend.dtos.ExpedienteIdRespuestaDTO;
+import com.dircomercio.site_backend.entities.DenunciaEstado;
 import com.dircomercio.site_backend.entities.Expediente;
+import com.dircomercio.site_backend.repositories.DenunciaEstadoRepository;
 import com.dircomercio.site_backend.services.ExpedienteService;
 
 @RestController
@@ -25,6 +31,9 @@ public class ExpedienteController {
 
     @Autowired
     private ExpedienteService expedienteService;
+
+    @Autowired 
+    private DenunciaEstadoRepository denunciaEstadoRepository;
 
     // Crear expediente con datos mínimos
     @PostMapping("/minimal")
@@ -80,6 +89,21 @@ public class ExpedienteController {
     public ResponseEntity<Expediente> editarExpediente(@PathVariable Long id, @RequestBody Expediente expedienteActualizado) {
         Expediente actualizado = expedienteService.actualizarExpediente(id, expedienteActualizado);
         return ResponseEntity.ok(actualizado);
+    }
+
+    @GetMapping("/traerEstados/{nroExp}")
+    public ResponseEntity<?> traerPorExp(@PathVariable String nroExp) {
+        List<DenunciaEstado> historial = denunciaEstadoRepository.findByDenuncia_Expediente_NroExp(nroExp);
+        List<DenunciaEstadoRespuestaDTO> respuesta = new ArrayList<>();
+        for (DenunciaEstado denunciaEstado : historial) {
+            DenunciaEstadoRespuestaDTO dto = DenunciaEstadoRespuestaDTO.builder()
+                .estado(denunciaEstado.getEstado())
+                .fecha(denunciaEstado.getFecha())
+                .observacion(denunciaEstado.getObservacion())
+                .build();
+            respuesta.add(dto);
+        }
+        return ResponseEntity.ok(respuesta);
     }
 }
 

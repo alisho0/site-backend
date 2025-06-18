@@ -9,4 +9,5 @@ import com.dircomercio.site_backend.entities.Denuncia;
 
 public interface DenunciaEstadoRepository extends CrudRepository<DenunciaEstado, Long> {
     List<DenunciaEstado> findByDenunciaOrderByFechaAsc(Denuncia denuncia);
+    List<DenunciaEstado> findByDenuncia_Expediente_NroExp(String nroExp);
 }

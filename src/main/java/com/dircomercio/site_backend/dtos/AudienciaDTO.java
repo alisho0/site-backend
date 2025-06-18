@@ -11,7 +11,6 @@ public class AudienciaDTO {
     private LocalDateTime fecha;
     private String hora;
     private String lugar;
-
     private String nroExp; 
     private List<String> nombresPersonas; // Solo los nombres de las personas
 }
