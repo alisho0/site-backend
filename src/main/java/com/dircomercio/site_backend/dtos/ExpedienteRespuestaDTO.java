@@ -1,6 +1,7 @@
 package com.dircomercio.site_backend.dtos;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,8 +18,6 @@ public class ExpedienteRespuestaDTO {
     private LocalDate fecha_finalizacion;
     private String hipervulnerable;
     private String delegacion;
-    /* Falta ->
-     * private UsuarioRespuestaDTO usuRespuesta;
-     * private List<AudienciasRespuestaDTO> auResp;
-     */
+    private List<UsuarioDTO> usuRespuesta;
+     
 }

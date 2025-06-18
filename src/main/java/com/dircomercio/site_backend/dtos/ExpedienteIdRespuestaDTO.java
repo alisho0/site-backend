@@ -1,6 +1,7 @@
 package com.dircomercio.site_backend.dtos;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,4 +20,5 @@ public class ExpedienteIdRespuestaDTO {
     private String hipervulnerable;
     private String delegacion;
     private DenunciaRespuestaDTO denuncia;
+    private List<UsuarioDTO> usuRespuesta;
 }

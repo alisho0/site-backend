@@ -16,6 +16,7 @@ import com.dircomercio.site_backend.dtos.ExpedienteIdRespuestaDTO;
 import com.dircomercio.site_backend.dtos.ExpedienteRespuestaDTO;
 import com.dircomercio.site_backend.dtos.ExpedienteUpdateDTO;
 import com.dircomercio.site_backend.dtos.PersonaConRolDTO;
+import com.dircomercio.site_backend.dtos.UsuarioDTO;
 import com.dircomercio.site_backend.entities.Denuncia;
 import com.dircomercio.site_backend.entities.DenunciaPersona;
 import com.dircomercio.site_backend.entities.Expediente;
@@ -123,7 +124,7 @@ public class ExpedienteServiceImpl implements ExpedienteService {
             .orElseThrow(() -> new IllegalArgumentException("Expediente no encontrado con ID: " + id));
             Denuncia denuncia = denunciaRepository.findById(expediente.getDenuncia().getId()).orElseThrow();
             ExpedienteIdRespuestaDTO respuestaDto = new ExpedienteIdRespuestaDTO();
-
+            List<UsuarioDTO> usuariosDtos = new ArrayList<>();
             DenunciaRespuestaDTO dto = new DenunciaRespuestaDTO();
             
             dto.setId(denuncia.getId());
@@ -131,6 +132,15 @@ public class ExpedienteServiceImpl implements ExpedienteService {
             dto.setEstado(denuncia.getEstado());
             dto.setMotivo(denuncia.getMotivo());
             dto.setObjeto(denuncia.getObjeto());
+            for (Usuario usu : expediente.getUsuarios()) {
+                UsuarioDTO usuarioDTO = UsuarioDTO.builder()
+                    .email(usu.getEmail())
+                    .nombreUsuario(usu.getNombre())
+                    .id(usu.getId())
+                    .build();
+                usuariosDtos.add(usuarioDTO);
+            }
+            respuestaDto.setUsuRespuesta(usuariosDtos);
             
             List<PersonaConRolDTO> personas = new ArrayList<>();
             for (DenunciaPersona dp : denuncia.getDenunciaPersonas()) {
@@ -197,9 +207,7 @@ public class ExpedienteServiceImpl implements ExpedienteService {
     @Override
     public Expediente actualizarExpediente(Long id, ExpedienteUpdateDTO dto) {
         return expedienteRepository.findById(id).map(expediente -> {
-            expediente.setNroExp(dto.getNroExp());
             expediente.setCant_folios(dto.getCant_folios());
-            expediente.setFecha_inicio(dto.getFecha_inicio());
             expediente.setFecha_finalizacion(dto.getFecha_finalizacion());
             expediente.setHipervulnerable(dto.getHipervulnerable());
             expediente.setDelegacion(dto.getDelegacion());

@@ -19,6 +19,7 @@ import com.dircomercio.site_backend.dtos.DenunciaEstadoRespuestaDTO;
 import com.dircomercio.site_backend.dtos.ExpedienteCreateDTO;
 import com.dircomercio.site_backend.dtos.ExpedienteCreateMinimalDTO;
 import com.dircomercio.site_backend.dtos.ExpedienteIdRespuestaDTO;
+import com.dircomercio.site_backend.dtos.ExpedienteRespuestaDTO;
 import com.dircomercio.site_backend.dtos.ExpedienteUpdateDTO;
 import com.dircomercio.site_backend.entities.DenunciaEstado;
 import com.dircomercio.site_backend.entities.Expediente;
@@ -79,9 +80,9 @@ public class ExpedienteController {
 
     // Editar expediente (solo si el usuario tiene acceso)
     @PutMapping("/editarExpediente/{id}")
-    public ResponseEntity<Expediente> editarExpediente(@PathVariable Long id, @RequestBody ExpedienteUpdateDTO dto) {
-        Expediente actualizado = expedienteService.actualizarExpediente(id, dto);
-        return ResponseEntity.ok(actualizado);
+    public ResponseEntity<?> editarExpediente(@PathVariable Long id, @RequestBody ExpedienteUpdateDTO dto) {
+        expedienteService.actualizarExpediente(id, dto);
+        return ResponseEntity.ok(obtenerExpedientePorId(id));
     }
 
     @GetMapping("/traerEstados/{nroExp}")
