@@ -47,6 +47,8 @@ public class SecurityConfig {
                     "/denuncia/actualizarEstado/{id}",
                     "doc/traerPorDenuncia/{id}", "doc/traerPorId/{id}"
                 ).hasAnyRole("MESA_ENTRADA", "ADMIN")
+                // Solo admin puede eliminar usuarios
+                .requestMatchers(HttpMethod.DELETE, "/usuarios/borrar/**").hasRole("ADMIN")
                 // Solo admin puede registrar
                 .requestMatchers(HttpMethod.POST, "/auth/register").hasRole("ADMIN")
                 .requestMatchers("/pases/**").hasRole("ADMIN")

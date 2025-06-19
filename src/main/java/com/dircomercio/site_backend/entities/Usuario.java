@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.dircomercio.site_backend.auth.repository.Token;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -36,7 +37,7 @@ public class Usuario {
     @Column(unique = true)
     private String email;
 
-    @OneToMany(mappedBy = "user" , fetch =  FetchType.LAZY)
+    @OneToMany(mappedBy = "user" ,cascade = CascadeType.ALL, orphanRemoval = true, fetch =  FetchType.LAZY)
     private List<Token> tokens;
 
     @OneToOne
