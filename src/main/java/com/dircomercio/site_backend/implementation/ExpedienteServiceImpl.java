@@ -126,6 +126,8 @@ public class ExpedienteServiceImpl implements ExpedienteService {
             ExpedienteIdRespuestaDTO respuestaDto = new ExpedienteIdRespuestaDTO();
             List<UsuarioDTO> usuariosDtos = new ArrayList<>();
             DenunciaRespuestaDTO dto = new DenunciaRespuestaDTO();
+            Long id_denuncia = denuncia.getId();
+
             
             dto.setId(denuncia.getId());
             dto.setDescripcion(denuncia.getDescripcion());
@@ -171,6 +173,7 @@ public class ExpedienteServiceImpl implements ExpedienteService {
             respuestaDto.setId(expediente.getId());
             respuestaDto.setNro_exp(expediente.getNroExp());
             respuestaDto.setDenuncia(dto);   
+            respuestaDto.setId_denuncia(id_denuncia);
             return respuestaDto;
         } catch (Exception e) {
             throw new IllegalArgumentException("Error al traer el expediente: " + e.getMessage());

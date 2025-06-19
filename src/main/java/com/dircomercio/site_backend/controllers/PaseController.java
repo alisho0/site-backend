@@ -59,8 +59,12 @@ public class PaseController {
     }
 
     @GetMapping("/traerPasesPorExp/{id}")
-    public ResponseEntity<List<PaseRespuestaDTO>> traerPasesPorExpediente(@PathVariable Long id) {
-        return ResponseEntity.ok(paseService.traerPasesPorExpediente(id));
+    public ResponseEntity<List<PaseRespuestaDTO>> traerPasesPorExpediente(@PathVariable Long id) throws Exception {
+        try {
+            return ResponseEntity.ok(paseService.traerPasesPorExpediente(id));
+        } catch (Exception e) {
+            throw new Exception("Excepcion:" + e.getMessage());
+        }
     }
 
     @PutMapping("/editarPase/{id}")

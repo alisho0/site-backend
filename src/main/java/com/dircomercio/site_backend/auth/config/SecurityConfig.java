@@ -49,6 +49,7 @@ public class SecurityConfig {
                 ).hasAnyRole("MESA_ENTRADA", "ADMIN")
                 // Solo admin puede registrar
                 .requestMatchers(HttpMethod.POST, "/auth/register").hasRole("ADMIN")
+                .requestMatchers("/pases/**").hasRole("ADMIN")
                 // Todo lo demás solo admin
                 .anyRequest().hasRole("ADMIN"))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

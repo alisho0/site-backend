@@ -98,6 +98,7 @@ public class PaseServiceImpl implements PaseService {
     
     @Override
     public List<PaseRespuestaDTO> traerPasesPorExpediente(Long expedienteId) {
+        try {
         List<Pase> pases = paseRepository.findByExpediente_Id(expedienteId);
         List<PaseRespuestaDTO> respuesta = new ArrayList<>();
         for (Pase pase : pases) {
@@ -113,7 +114,10 @@ public class PaseServiceImpl implements PaseService {
             respuesta.add(dto);
         }
         return respuesta;
-    }
+        }
+         catch (Exception e) {
+            throw new IllegalArgumentException("No se encontraron pases para el expediente con ID: " + e.getMessage());
+        }};
 
     @Override
     public PaseRespuestaDTO editarPase(Long id, PaseCreateDTO dto) {

@@ -21,4 +21,5 @@ public class ExpedienteIdRespuestaDTO {
     private String delegacion;
     private DenunciaRespuestaDTO denuncia;
     private List<UsuarioDTO> usuRespuesta;
+    private Long id_denuncia;
 }
