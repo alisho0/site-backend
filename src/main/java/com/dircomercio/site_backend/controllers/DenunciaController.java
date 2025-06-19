@@ -85,10 +85,10 @@ public class DenunciaController {
         }
     }
     
-    @PostMapping("/mandarCorreo")
-    public ResponseEntity<?> mandarCorreo(Long denunciaId, String observacion) throws Exception {
+    @PostMapping("/mandarCorreo/{id}")
+    public ResponseEntity<?> mandarCorreo(@PathVariable Long id, @RequestBody String observacion) throws Exception {
         try {
-            denunciaService.notificarEstadoSinCambio(denunciaId, observacion);
+            denunciaService.notificarEstadoSinCambio(id, observacion);
             return ResponseEntity.ok("Correo enviado correctamente");
         } catch (Exception e) {
             throw new Exception("Hubo un problema al mandar el correo: " + e.getMessage());
