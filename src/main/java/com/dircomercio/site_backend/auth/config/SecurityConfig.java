@@ -39,7 +39,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(req -> 
             req
                 // Endpoints públicos
-                .requestMatchers( "/rol/**", "/auth/register","/expediente/traerEstados/{nroExp}", "/auth/login", "/auth/logout", "/auth/refresh", "/denuncia/subirDenuncia", "/denuncia/traerDenunciaPorExp").permitAll()
+                .requestMatchers("/usuarios/**", "/rol/**", "/auth/register","/expediente/traerEstados/{nroExp}", "/auth/login", "/auth/logout", "/auth/refresh", "/denuncia/subirDenuncia", "/denuncia/traerDenunciaPorExp").permitAll()
                 // Endpoints de mesa de entrada (y admin)
                 .requestMatchers(
                     "/denuncia/traerDenuncia",
