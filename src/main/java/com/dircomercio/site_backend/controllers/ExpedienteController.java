@@ -25,6 +25,8 @@ import com.dircomercio.site_backend.entities.DenunciaEstado;
 import com.dircomercio.site_backend.entities.Expediente;
 import com.dircomercio.site_backend.repositories.DenunciaEstadoRepository;
 import com.dircomercio.site_backend.services.ExpedienteService;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @RequestMapping("/expediente")
@@ -99,5 +101,17 @@ public class ExpedienteController {
         }
         return ResponseEntity.ok(respuesta);
     }
+
+    @GetMapping("/traerPorUsuario/{id}")
+    public ResponseEntity<?> traerPorUsuario(@PathVariable Long id) {
+        try {
+            List expedientesResp = expedienteService.listarExpedientesPorUsuario(id);
+            return ResponseEntity.ok(expedientesResp);
+        } catch (Exception e) {
+            // Manejo de excepciones
+            return ResponseEntity.status(500).body("Error al obtener los expedientes: " + e.getMessage());
+        }
+    }
+    
 }
 

@@ -184,14 +184,25 @@ public class ExpedienteServiceImpl implements ExpedienteService {
 
     @Override
     public List<ExpedienteRespuestaDTO> listarExpedientes() {
-        var usuario = authUtil.getUsuarioAutenticado();
-        boolean esAdmin = usuario.getRol() != null && usuario.getRol().getNombre().equalsIgnoreCase("ADMIN");
-        List<Expediente> expedientes;
-        if (esAdmin) {
-            expedientes = (List<Expediente>) expedienteRepository.findAll();
-        } else {
-            expedientes = expedienteRepository.findByUsuarios_Id(usuario.getId());
+        List<Expediente> expedientes = (List<Expediente>) expedienteRepository.findAll();
+        List<ExpedienteRespuestaDTO> respuesta = new ArrayList<>();
+        for (Expediente e : expedientes) {
+            ExpedienteRespuestaDTO dto = new ExpedienteRespuestaDTO();
+            dto.setId(e.getId());
+            dto.setCant_folios(e.getCant_folios());
+            dto.setDelegacion(e.getDelegacion());
+            dto.setFecha_finalizacion(e.getFecha_finalizacion());
+            dto.setFecha_inicio(e.getFecha_inicio());
+            dto.setHipervulnerable(e.getHipervulnerable());
+            dto.setNro_exp(e.getNroExp());
+            respuesta.add(dto);
         }
+        return respuesta;
+    }
+
+    // Método que trae expediente según el usuario
+    public List<ExpedienteRespuestaDTO> listarExpedientesPorUsuario(Long id) {
+        List<Expediente> expedientes = expedienteRepository.findByUsuarios_Id(id); // Busca expedientes asociados al usuario
         List<ExpedienteRespuestaDTO> respuesta = new ArrayList<>();
         for (Expediente e : expedientes) {
             ExpedienteRespuestaDTO dto = new ExpedienteRespuestaDTO();

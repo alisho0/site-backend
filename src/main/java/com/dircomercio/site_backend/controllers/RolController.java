@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
 @RequestMapping("/rol")
-@CrossOrigin(origins = "http://localhost:5173")
 public class RolController {
 
     @Autowired

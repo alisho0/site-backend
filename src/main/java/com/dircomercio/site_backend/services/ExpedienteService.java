@@ -27,4 +27,6 @@ public interface ExpedienteService {
     void eliminarExpediente(Long id);
 
     Expediente crearExpedienteDesdeMinimalDTO(ExpedienteCreateMinimalDTO dto) throws Exception;
+
+    List<ExpedienteRespuestaDTO> listarExpedientesPorUsuario(Long id) throws Exception;
 }
