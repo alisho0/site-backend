@@ -94,7 +94,7 @@ public class DenunciaServiceImpl implements DenunciaService {
             dPersonaService.vincularPersonaDenuncia(personasRolPersistidas, denuncia);
 
             // Aquí se guardan los documentos, sigue igual
-            documentoService.guardarDocumentos(files, denuncia);
+            documentoService.guardarDocumentos(files, denuncia, null);
 
         } catch (Exception e) {
             e.getMessage();

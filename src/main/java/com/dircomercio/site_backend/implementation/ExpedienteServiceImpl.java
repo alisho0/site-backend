@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.dircomercio.site_backend.auth.config.AuthUtil;
@@ -103,10 +104,6 @@ public class ExpedienteServiceImpl implements ExpedienteService {
         expediente.setFecha_inicio(LocalDate.now());
         expediente.setNroExp(nroExpediente);
         expediente.setCant_folios("0");
-        // expediente.setDenuncia(denuncia);
-        // expediente.setFecha_finalizacion(null);
-        // expediente.setHipervulnerable(null);
-        // expediente.setDelegacion(null);
 
         Expediente expedienteGuardado = expedienteRepository.save(expediente);
 
@@ -195,27 +192,55 @@ public class ExpedienteServiceImpl implements ExpedienteService {
             dto.setFecha_inicio(e.getFecha_inicio());
             dto.setHipervulnerable(e.getHipervulnerable());
             dto.setNro_exp(e.getNroExp());
+            List<UsuarioDTO> usuariosDtos = new ArrayList<>();
+            for (Usuario usu : e.getUsuarios()) {
+                    UsuarioDTO usuDto = UsuarioDTO.builder()
+                        .email(usu.getEmail())
+                        .nombreUsuario(usu.getNombre())
+                        .rol(usu.getEmail())
+                        .id(usu.getId())
+                        .build();
+                    usuariosDtos.add(usuDto);
+            }
+            dto.setUsuRespuesta(usuariosDtos);
             respuesta.add(dto);
         }
         return respuesta;
     }
 
     // Método que trae expediente según el usuario
-    public List<ExpedienteRespuestaDTO> listarExpedientesPorUsuario(Long id) {
-        List<Expediente> expedientes = expedienteRepository.findByUsuarios_Id(id); // Busca expedientes asociados al usuario
-        List<ExpedienteRespuestaDTO> respuesta = new ArrayList<>();
-        for (Expediente e : expedientes) {
-            ExpedienteRespuestaDTO dto = new ExpedienteRespuestaDTO();
-            dto.setId(e.getId());
-            dto.setCant_folios(e.getCant_folios());
-            dto.setDelegacion(e.getDelegacion());
-            dto.setFecha_finalizacion(e.getFecha_finalizacion());
-            dto.setFecha_inicio(e.getFecha_inicio());
-            dto.setHipervulnerable(e.getHipervulnerable());
-            dto.setNro_exp(e.getNroExp());
-            respuesta.add(dto);
+    public List<ExpedienteRespuestaDTO> listarExpedientesPorUsuario() throws Exception { // creo que ni hace falta el id, solo sacar el token
+        try {  
+            String email = SecurityContextHolder.getContext().getAuthentication().getName();
+            List<Expediente> expedientes = expedienteRepository.findByUsuarios_Email(email); // Busca expedientes asociados al usuario
+            List<ExpedienteRespuestaDTO> respuesta = new ArrayList<>();
+            for (Expediente e : expedientes) {
+                ExpedienteRespuestaDTO dto = new ExpedienteRespuestaDTO();
+                dto.setId(e.getId());
+                dto.setCant_folios(e.getCant_folios());
+                dto.setDelegacion(e.getDelegacion());
+                dto.setFecha_finalizacion(e.getFecha_finalizacion());
+                dto.setFecha_inicio(e.getFecha_inicio());
+                dto.setHipervulnerable(e.getHipervulnerable());
+                dto.setNro_exp(e.getNroExp());
+                List<UsuarioDTO> usuariosDtos = new ArrayList<>();
+                for (Usuario usu : e.getUsuarios()) {
+                    UsuarioDTO usuDto = UsuarioDTO.builder()
+                        .email(usu.getEmail())
+                        .nombreUsuario(usu.getNombre())
+                        .rol(usu.getEmail())
+                        .id(usu.getId())
+                        .build();
+                    usuariosDtos.add(usuDto);
+                }
+                dto.setUsuRespuesta(usuariosDtos);
+                respuesta.add(dto);
+            }
+            return respuesta;
         }
-        return respuesta;
+        catch (Exception e) {
+            throw new Exception("Error al obtener los expedientes en Impl: " + e.getMessage());
+        }
     }
 
     @Override

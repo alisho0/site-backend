@@ -30,4 +30,8 @@ public class Documento {
     @ManyToOne(optional = false)
     @JoinColumn(name = "denuncia_id", nullable = false)
     private Denuncia denuncia;
+
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "pase_id", nullable = true)
+    private Pase pase;
 }

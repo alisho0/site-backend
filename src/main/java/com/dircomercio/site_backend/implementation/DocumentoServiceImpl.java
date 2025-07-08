@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.dircomercio.site_backend.dtos.DocumentoRespuestaDTO;
 import com.dircomercio.site_backend.entities.Denuncia;
 import com.dircomercio.site_backend.entities.Documento;
+import com.dircomercio.site_backend.entities.Pase;
 import com.dircomercio.site_backend.repositories.DocumentoRepository;
 import com.dircomercio.site_backend.services.DocumentoService;
 
@@ -25,9 +26,8 @@ public class DocumentoServiceImpl implements DocumentoService {
     DocumentoRepository documentoRepository;
 
     @Override
-    public List<Documento> guardarDocumentos(List<MultipartFile> files, Denuncia denuncia) throws Exception {
+    public List<Documento> guardarDocumentos(List<MultipartFile> files, Denuncia denuncia, Pase pase) throws Exception {
         List<Documento> documentos = new ArrayList<>();
-
         try {
             
             for (MultipartFile file : files) {
@@ -56,6 +56,7 @@ public class DocumentoServiceImpl implements DocumentoService {
                 documento.setFormato(fileExtension);
                 documento.setRuta(path.toString()); // Guardamos la ruta del archivo
                 documento.setDenuncia(denuncia);
+                documento.setPase(pase);
                 Files.write(path, bytes);
                 documentos.add(documento);
             }

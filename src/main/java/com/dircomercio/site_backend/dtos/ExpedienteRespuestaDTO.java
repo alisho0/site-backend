@@ -3,6 +3,8 @@ package com.dircomercio.site_backend.dtos;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.dircomercio.site_backend.entities.Usuario;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

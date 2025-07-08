@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dircomercio.site_backend.dtos.DenunciaEstadoRespuestaDTO;
-import com.dircomercio.site_backend.dtos.ExpedienteCreateDTO;
 import com.dircomercio.site_backend.dtos.ExpedienteCreateMinimalDTO;
 import com.dircomercio.site_backend.dtos.ExpedienteIdRespuestaDTO;
 import com.dircomercio.site_backend.dtos.ExpedienteRespuestaDTO;
@@ -25,7 +23,6 @@ import com.dircomercio.site_backend.entities.DenunciaEstado;
 import com.dircomercio.site_backend.entities.Expediente;
 import com.dircomercio.site_backend.repositories.DenunciaEstadoRepository;
 import com.dircomercio.site_backend.services.ExpedienteService;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController
@@ -49,13 +46,6 @@ public class ExpedienteController {
     @PostMapping("/desde-denuncia/{denunciaId}")
     public ResponseEntity<Expediente> crearExpedienteDesdeDenuncia(@PathVariable Long denunciaId) throws Exception {
         Expediente nuevo = expedienteService.crearExpedienteDesdeDenuncia(denunciaId);
-        return ResponseEntity.ok(nuevo);
-    }
-
-    // Crear expediente completo
-    @PostMapping
-    public ResponseEntity<Expediente> crearExpediente(@RequestBody ExpedienteCreateDTO dto) {
-        Expediente nuevo = expedienteService.crearExpedienteDesdeDTO(dto);
         return ResponseEntity.ok(nuevo);
     }
 
@@ -102,10 +92,10 @@ public class ExpedienteController {
         return ResponseEntity.ok(respuesta);
     }
 
-    @GetMapping("/traerPorUsuario/{id}")
-    public ResponseEntity<?> traerPorUsuario(@PathVariable Long id) {
+    @GetMapping("/traerPorUsuario")
+    public ResponseEntity<?> traerPorUsuario() {
         try {
-            List expedientesResp = expedienteService.listarExpedientesPorUsuario(id);
+            List<ExpedienteRespuestaDTO> expedientesResp = expedienteService.listarExpedientesPorUsuario();
             return ResponseEntity.ok(expedientesResp);
         } catch (Exception e) {
             // Manejo de excepciones

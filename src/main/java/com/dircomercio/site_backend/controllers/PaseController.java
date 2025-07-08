@@ -3,10 +3,12 @@ package com.dircomercio.site_backend.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.dircomercio.site_backend.dtos.PaseCreateDTO;
 import com.dircomercio.site_backend.dtos.PaseRespuestaDTO;
 import com.dircomercio.site_backend.services.PaseService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
 
@@ -17,11 +19,12 @@ public class PaseController {
     PaseService paseService;
     
     @PostMapping("/crearPase")
-    public ResponseEntity<?> crearPase(@RequestBody PaseCreateDTO paseCreateDTO) {
-        try {        
-            if (paseCreateDTO != null) {
-                System.out.println(paseCreateDTO);
-                paseService.crearPase(paseCreateDTO);
+    public ResponseEntity<?> crearPase(@RequestPart("pase") String paseJson, @RequestPart("file") List<MultipartFile> file) {
+        try { 
+            ObjectMapper mapper = new ObjectMapper();
+            PaseCreateDTO paseCreateDTO = mapper.readValue(paseJson, PaseCreateDTO.class);   
+            if (paseCreateDTO != null && paseCreateDTO.getExpedienteId() != null && file != null && !file.isEmpty()) {
+                paseService.crearPase(paseCreateDTO, file);
                 return ResponseEntity.ok().body("El pase fue creado correctamente...");
             }
             return ResponseEntity.badRequest().body("El pase no fue creado, verifique los datos ingresados.");

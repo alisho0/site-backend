@@ -28,5 +28,5 @@ public interface ExpedienteService {
 
     Expediente crearExpedienteDesdeMinimalDTO(ExpedienteCreateMinimalDTO dto) throws Exception;
 
-    List<ExpedienteRespuestaDTO> listarExpedientesPorUsuario(Long id) throws Exception;
+    List<ExpedienteRespuestaDTO> listarExpedientesPorUsuario() throws Exception;
 }
