@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class PerfilDTO {
     private String nombre;
     private String email;
-    private String sector; // Rol del usuario
+    private String area; // Rol del usuario
 }
