@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.dircomercio.site_backend.dtos.DenunciaDTO;
+import com.dircomercio.site_backend.dtos.DenunciaRespuestaDTO;
 import com.dircomercio.site_backend.dtos.DenunciaUpdateDTO;
 import com.dircomercio.site_backend.services.DenunciaService;
 import com.dircomercio.site_backend.services.DocumentoService;
@@ -22,6 +23,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 
@@ -72,6 +75,17 @@ public class DenunciaController {
             return ResponseEntity.badRequest().body("No se pudo traer la denuncia.");
         }
     }
+
+    @GetMapping("/traerDenunciasPorUsuario")
+    public ResponseEntity<?> traerPorUsu() {
+        try {
+            List<DenunciaRespuestaDTO> denuncias = denunciaService.traerDenunciasPorUsuario();
+            return ResponseEntity.ok().body(denuncias);
+        } catch (Exception e) {
+            throw new RuntimeException("No se pudo traer las denuncias por usuario: " + e.getMessage());
+        }
+    }
+    
 
     @PutMapping("/actualizarEstado/{id}")
     public ResponseEntity<?> actualizarEstado(@PathVariable Long id, @RequestBody DenunciaUpdateDTO dto) {

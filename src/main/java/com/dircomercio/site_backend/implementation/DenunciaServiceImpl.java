@@ -19,6 +19,7 @@ import com.dircomercio.site_backend.dtos.PersonaRolDTO;
 import com.dircomercio.site_backend.entities.Denuncia;
 import com.dircomercio.site_backend.entities.DenunciaEstado;
 import com.dircomercio.site_backend.entities.DenunciaPersona;
+import com.dircomercio.site_backend.entities.Expediente;
 import com.dircomercio.site_backend.entities.Persona;
 import com.dircomercio.site_backend.repositories.DenunciaEstadoRepository;
 import com.dircomercio.site_backend.repositories.DenunciaRepository;
@@ -269,23 +270,50 @@ public class DenunciaServiceImpl implements DenunciaService {
         emailService.enviarEmail(destinarario, asunto, msjHtml);
     }
 
-    // Esto ya no iría, pero lo dejo para que vean
     @Override
-    public void rechazarDenuncia(Long id, String motivoRechazo) throws Exception {
-        /*
-         * try {
-         * Denuncia denuncia = denunciaRepository.findById(id).orElseThrow();
-         * denuncia.setEstado("RECHAZADA");
-         * denunciaRepository.save(denuncia);
-         * 
-         * // Mandar un email al denunciante informando del rechazo
-         * String destinarario =
-         * denuncia.getDenunciaPersonas().get(0).getPersona().getEmail();
-         * String asunto = "Denuncia Rechazada";
-         * emailService.enviarEmail(destinarario, asunto, motivoRechazo);
-         * } catch (Exception e) {
-         * throw new Exception("No se encontró la denuncia con el ID proporcionado");
-         * }
-         */
+    public List<DenunciaRespuestaDTO> traerDenunciasPorUsuario() throws Exception {
+        try {
+            String email = SecurityContextHolder.getContext().getAuthentication().getName();
+            List<Expediente> expediente = expedienteRepository.findByUsuarios_Email(email);
+            if (expediente.isEmpty()) {
+                throw new Exception("No se encontraron expedientes para el usuario con email: " + email);
+            }
+            List<DenunciaRespuestaDTO> denunciasResp = new ArrayList<>();
+            for (Expediente exp : expediente) {
+                List<PersonaConRolDTO> personasDto = new ArrayList<>();
+                for (DenunciaPersona dp : exp.getDenuncia().getDenunciaPersonas()) {
+                    PersonaConRolDTO p = new PersonaConRolDTO();
+                    p.setId(dp.getPersona().getId());
+                    p.setNombre(dp.getPersona().getNombre());
+                    p.setApellido(dp.getPersona().getApellido());
+                    p.setEmail(dp.getPersona().getEmail());
+                    p.setTelefono(dp.getPersona().getTelefono());
+                    p.setCp(dp.getPersona().getCp());
+                    p.setLocalidad(dp.getPersona().getLocalidad());
+                    p.setDocumento(dp.getPersona().getDocumento());
+                    p.setDomicilio(dp.getPersona().getDomicilio());
+                    p.setFax(dp.getPersona().getFax());
+                    p.setRol(dp.getRol());
+                    p.setNombreDelegado(dp.getNombreDelegado());
+                    p.setApellidoDelegado(dp.getApellidoDelegado());
+                    p.setDniDelegado(dp.getDniDelegado());
+                    personasDto.add(p);
+                }
+                DenunciaRespuestaDTO denunciaResp = DenunciaRespuestaDTO.builder()
+                    .id(exp.getDenuncia().getId())
+                    .descripcion(exp.getDenuncia().getDescripcion())
+                    .objeto(exp.getDenuncia().getObjeto())
+                    .motivo(exp.getDenuncia().getMotivo())
+                    .estado(exp.getDenuncia().getEstado())
+                    .personas(personasDto)
+                    .build();
+                denunciasResp.add(denunciaResp);
+            }
+            return denunciasResp;
+        } catch (Exception e) {
+            throw new Exception("Error al traer las denuncias por usuario: " + e.getMessage());
+        }
     }
+    
+    
 }
