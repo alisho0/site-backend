@@ -47,5 +47,6 @@ public class Denuncia {
     @OneToMany(mappedBy = "denuncia", cascade = CascadeType.ALL)
     private List<DenunciaEstado> historialEstados;
 
-    
+    @OneToMany(mappedBy = "denuncia", cascade = CascadeType.ALL)
+    private List<Documento> documentos;
 }

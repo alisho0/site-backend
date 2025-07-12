@@ -15,6 +15,7 @@ import com.dircomercio.site_backend.dtos.PaseRespuestaDTO;
 import com.dircomercio.site_backend.entities.Denuncia;
 import com.dircomercio.site_backend.entities.Expediente;
 import com.dircomercio.site_backend.entities.Pase;
+import com.dircomercio.site_backend.entities.TipoDocumento;
 import com.dircomercio.site_backend.entities.Usuario;
 import com.dircomercio.site_backend.repositories.ExpedienteRepository;
 import com.dircomercio.site_backend.repositories.PaseRepository;
@@ -59,7 +60,7 @@ public class PaseServiceImpl implements PaseService {
         }
         try {
             paseRepository.save(pase);
-            documentoService.guardarDocumentos(file, denuncia, pase);
+            documentoService.guardarDocumentos(file, denuncia, pase, dto.getTipoDocumento());
         } catch (Exception e) {
             // TODO: handle exception
         }

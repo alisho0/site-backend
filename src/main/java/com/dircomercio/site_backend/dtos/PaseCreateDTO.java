@@ -3,6 +3,7 @@ package com.dircomercio.site_backend.dtos;
 import java.time.LocalDate;
 
 import com.dircomercio.site_backend.entities.Area;
+import com.dircomercio.site_backend.entities.TipoDocumento;
 
 import lombok.Data;
 
@@ -17,4 +18,6 @@ public class PaseCreateDTO {
 
     private Long expedienteId;
     private Long usuarioId;
+
+    private TipoDocumento tipoDocumento; 
 }
