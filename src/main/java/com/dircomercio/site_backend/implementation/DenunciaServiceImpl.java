@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.dircomercio.site_backend.dtos.DenunciaDTO;
+import com.dircomercio.site_backend.dtos.DenunciaEstadoRespuestaDTO;
 import com.dircomercio.site_backend.dtos.DenunciaRespuestaDTO;
 import com.dircomercio.site_backend.dtos.DenunciaUpdateDTO;
 import com.dircomercio.site_backend.dtos.PersonaConRolDTO;
@@ -288,4 +289,21 @@ public class DenunciaServiceImpl implements DenunciaService {
          * }
          */
     }
+    @Override
+    public List<DenunciaEstadoRespuestaDTO> obtenerHistorialPorNroExp(String nroExp) throws Exception {
+    // 1) Busca la denuncia relacionada por nroExp
+    List<DenunciaEstado> historial = denunciaEstadoRepository.findByDenuncia_Expediente_NroExp(nroExp);
+
+    if (historial == null || historial.isEmpty()) {
+        throw new Exception("No se encontraron estados para la denuncia con nroExp: " + nroExp);
+    }
+
+    return historial.stream().map(estado -> DenunciaEstadoRespuestaDTO.builder()
+            .estado(estado.getEstado())
+            .observacion(estado.getObservacion())
+            .fecha(estado.getFecha())
+            .build())
+        .toList();
+    }
+
 }
