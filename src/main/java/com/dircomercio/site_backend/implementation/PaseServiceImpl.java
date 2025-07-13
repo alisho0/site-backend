@@ -93,12 +93,12 @@ public class PaseServiceImpl implements PaseService {
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró el pase con ID: " + id));
         PaseRespuestaDTO dto = new PaseRespuestaDTO();
         dto.setId(pase.getId());
-        dto.setAsunto(dto.getAsunto());
-        dto.setCantFolios(dto.getCantFolios());
-        dto.setFechaAccion(dto.getFechaAccion());
-        dto.setAreaOrigen(dto.getAreaOrigen());
-        dto.setAreaDestino(dto.getAreaDestino());
-        dto.setDescripcion(dto.getDescripcion());
+        dto.setAsunto(pase.getAsunto());
+        dto.setCantFolios(pase.getCantFolios());
+        dto.setFechaAccion(pase.getFechaAccion());
+        dto.setAreaOrigen(pase.getAreaOrigen());
+        dto.setAreaDestino(pase.getAreaDestino());
+        dto.setDescripcion(pase.getDescripcion());
         dto.setNroExpediente(pase.getExpediente() != null ? pase.getExpediente().getNroExp() : null);
         dto.setNombreUsuario(pase.getUsuario() != null ? pase.getUsuario().getNombre() : null);
         return dto;
@@ -120,12 +120,12 @@ public class PaseServiceImpl implements PaseService {
         for (Pase pase : pases) {
             PaseRespuestaDTO dto = new PaseRespuestaDTO();
             dto.setId(pase.getId());
-            dto.setAsunto(dto.getAsunto());
-            dto.setCantFolios(dto.getCantFolios());
-            dto.setFechaAccion(dto.getFechaAccion());
-            dto.setAreaOrigen(dto.getAreaOrigen());
-            dto.setAreaDestino(dto.getAreaDestino());
-            dto.setDescripcion(dto.getDescripcion());
+            dto.setAsunto(pase.getAsunto());
+            dto.setCantFolios(pase.getCantFolios());
+            dto.setFechaAccion(pase.getFechaAccion());
+            dto.setAreaOrigen(pase.getAreaOrigen());
+            dto.setAreaDestino(pase.getAreaDestino());
+            dto.setDescripcion(pase.getDescripcion());
             dto.setNroExpediente(pase.getExpediente() != null ? pase.getExpediente().getNroExp() : null);
             dto.setNombreUsuario(pase.getUsuario() != null ? pase.getUsuario().getNombre() : null);
             respuesta.add(dto);
