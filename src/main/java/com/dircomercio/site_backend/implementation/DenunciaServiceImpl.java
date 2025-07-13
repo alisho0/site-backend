@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.dircomercio.site_backend.dtos.DenunciaDTO;
+import com.dircomercio.site_backend.dtos.DenunciaEstadoRespuestaDTO;
 import com.dircomercio.site_backend.dtos.DenunciaRespuestaDTO;
 import com.dircomercio.site_backend.dtos.DenunciaUpdateDTO;
 import com.dircomercio.site_backend.dtos.PersonaConRolDTO;
@@ -314,6 +315,30 @@ public class DenunciaServiceImpl implements DenunciaService {
             throw new Exception("Error al traer las denuncias por usuario: " + e.getMessage());
         }
     }
+
+    @Override
+    public List<DenunciaEstadoRespuestaDTO> traerHistorialDenuncia(Long id) throws Exception {
+    // 1) Busca la denuncia relacionada por nroExp
+    Denuncia denuncia = denunciaRepository.findById(id)
+            .orElseThrow(() -> new Exception("No se encontró la denuncia con el ID proporcionado"));
+    List<DenunciaEstado> historial = denunciaEstadoRepository.findByDenunciaOrderByFechaAsc(denuncia);
+
+    if (historial == null || historial.isEmpty()) {
+        throw new Exception("No se encontraron estados para la denuncia con id de Denuncia: " + id);
+    }
+
+    List<DenunciaEstadoRespuestaDTO> respuesta = new ArrayList<>();
+    for (DenunciaEstado estado : historial) {
+        DenunciaEstadoRespuestaDTO dto = new DenunciaEstadoRespuestaDTO();
+        dto.setEstado(estado.getEstado());
+        dto.setFecha(estado.getFecha());
+        dto.setObservacion(estado.getObservacion());
+        respuesta.add(dto);
+    }   
+
+    return respuesta;
+    }
+    
     
     
 }

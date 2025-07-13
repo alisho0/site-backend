@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.dircomercio.site_backend.dtos.DenunciaDTO;
+import com.dircomercio.site_backend.dtos.DenunciaEstadoRespuestaDTO;
 import com.dircomercio.site_backend.dtos.DenunciaRespuestaDTO;
 import com.dircomercio.site_backend.dtos.DenunciaUpdateDTO;
 import com.dircomercio.site_backend.services.DenunciaService;
@@ -39,6 +40,16 @@ public class DenunciaController {
 
     @Autowired
     DocumentoService documentoService;
+
+     @GetMapping("/historial/{id}")
+    public ResponseEntity<?> getHistorialDenuncia(@PathVariable Long id) {
+        try {
+            List<DenunciaEstadoRespuestaDTO> historial = denunciaService.traerHistorialDenuncia(id);
+            return ResponseEntity.ok(historial);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("No se pudo obtener el historial para el id: " + id);
+        }
+    }
 
     @PostMapping("/subirDenuncia")
     public ResponseEntity<?> subirDenuncia(
