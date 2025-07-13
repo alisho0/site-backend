@@ -39,13 +39,13 @@ public class SecurityConfig {
             .authorizeHttpRequests(req -> 
             req
                 // Endpoints públicos
-                .requestMatchers("/usuarios/**", "/rol/**", "/auth/register","/expediente/traerEstados/{nroExp}", "/auth/login", "/auth/logout", "/auth/refresh", "/denuncia/subirDenuncia", "/denuncia/traerDenunciaPorExp").permitAll()
+                .requestMatchers(/* "/rol/**", "/auth/register",*/"/expediente/traerEstados/{nroExp}", "/auth/login", "/auth/logout", "/auth/refresh", "/denuncia/subirDenuncia", "/denuncia/traerDenunciaPorExp", "/auth/register").permitAll()
                 // Endpoints de mesa de entrada (y admin)
                 .requestMatchers(
                     "/denuncia/traerDenuncia",
                     "/denuncia/traerDenunciaPorId/{id}",
                     "/denuncia/actualizarEstado/{id}",
-                    "doc/traerPorDenuncia/{id}", "doc/traerPorId/{id}" 
+                    "doc/traerPorDenuncia/{id}", "doc/traerPorId/{id}", "/usuarios/perfilUsuario", "/usuarios/actualizarNombre", "/usuarios/cambiarPassword", "/usuarios/traerUsuarios"
                 ).hasAnyRole("MESA_ENTRADA", "ADMIN")
                 // Solo admin puede eliminar usuarios
                 .requestMatchers(HttpMethod.DELETE, "/usuarios/borrar/**").hasRole("ADMIN")
