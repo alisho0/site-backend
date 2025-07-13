@@ -18,6 +18,6 @@ public interface DenunciaService {
     Denuncia actualizarEstadoDenuncia(Long id, DenunciaUpdateDTO dto) throws Exception;
     void rechazarDenuncia(Long id, String motivoRechazo) throws Exception;
     void notificarEstadoSinCambio(Long denunciaId, String observacion) throws Exception;
-    List<DenunciaEstadoRespuestaDTO> obtenerHistorialPorNroExp(String nroExp) throws Exception;
+    List<DenunciaEstadoRespuestaDTO> traerHistorialDenuncia(Long id) throws Exception;
 
 }

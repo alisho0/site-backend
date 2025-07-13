@@ -290,20 +290,26 @@ public class DenunciaServiceImpl implements DenunciaService {
          */
     }
     @Override
-    public List<DenunciaEstadoRespuestaDTO> obtenerHistorialPorNroExp(String nroExp) throws Exception {
+    public List<DenunciaEstadoRespuestaDTO> traerHistorialDenuncia(Long id) throws Exception {
     // 1) Busca la denuncia relacionada por nroExp
-    List<DenunciaEstado> historial = denunciaEstadoRepository.findByDenuncia_Expediente_NroExp(nroExp);
+    Denuncia denuncia = denunciaRepository.findById(id)
+            .orElseThrow(() -> new Exception("No se encontró la denuncia con el ID proporcionado"));
+    List<DenunciaEstado> historial = denunciaEstadoRepository.findByDenunciaOrderByFechaAsc(denuncia);
 
     if (historial == null || historial.isEmpty()) {
-        throw new Exception("No se encontraron estados para la denuncia con nroExp: " + nroExp);
+        throw new Exception("No se encontraron estados para la denuncia con id de Denuncia: " + id);
     }
 
-    return historial.stream().map(estado -> DenunciaEstadoRespuestaDTO.builder()
-            .estado(estado.getEstado())
-            .observacion(estado.getObservacion())
-            .fecha(estado.getFecha())
-            .build())
-        .toList();
+    List<DenunciaEstadoRespuestaDTO> respuesta = new ArrayList<>();
+    for (DenunciaEstado estado : historial) {
+        DenunciaEstadoRespuestaDTO dto = new DenunciaEstadoRespuestaDTO();
+        dto.setEstado(estado.getEstado());
+        dto.setFecha(estado.getFecha());
+        dto.setObservacion(estado.getObservacion());
+        respuesta.add(dto);
+    }   
+
+    return respuesta;
     }
 
 }

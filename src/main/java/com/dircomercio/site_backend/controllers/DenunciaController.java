@@ -39,13 +39,13 @@ public class DenunciaController {
     @Autowired
     DocumentoService documentoService;
 
-     @GetMapping("/historial/{nroExp}")
-    public ResponseEntity<?> getHistorialDenuncia(@PathVariable String nroExp) {
+     @GetMapping("/historial/{id}")
+    public ResponseEntity<?> getHistorialDenuncia(@PathVariable Long id) {
         try {
-            List<DenunciaEstadoRespuestaDTO> historial = denunciaService.obtenerHistorialPorNroExp(nroExp);
+            List<DenunciaEstadoRespuestaDTO> historial = denunciaService.traerHistorialDenuncia(id);
             return ResponseEntity.ok(historial);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("No se pudo obtener el historial para el expediente: " + nroExp);
+            return ResponseEntity.badRequest().body("No se pudo obtener el historial para el id: " + id);
         }
     }
 
