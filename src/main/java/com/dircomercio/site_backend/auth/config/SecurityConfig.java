@@ -46,13 +46,12 @@ public class SecurityConfig {
                     "/denuncia/traerDenunciaPorId/{id}",
                     "/denuncia/actualizarEstado/{id}",
                     "doc/traerPorDenuncia/{id}", "doc/traerPorId/{id}", "/usuarios/perfilUsuario", "/usuarios/actualizarNombre", "/usuarios/cambiarPassword", "/usuarios/traerUsuarios"
-                ).hasAnyRole("MESA_ENTRADA", "ADMIN")
+                ).hasAnyRole("MESA_ENTRADA", "ADMIN", "ABOGADO")
                 // Solo admin puede eliminar usuarios
                 .requestMatchers(HttpMethod.DELETE, "/usuarios/borrar/**").hasRole("ADMIN")
                 // Solo admin puede registrar
                 .requestMatchers(HttpMethod.POST, "/auth/register").hasRole("ADMIN")
-                .requestMatchers("/pases/**").hasRole("ADMIN")
-                .requestMatchers("/expediente/traerPorUsuario").hasAnyRole("ADMIN", "ABOGADO")
+                .requestMatchers("/expediente/traerPorUsuario", "/expediente/traerExpedientePorId/{id}", "/pases/**", "/pases/traerPasesPorExp/{id}", "/audiencias/**").hasAnyRole("ADMIN", "ABOGADO")
                 // Todo lo demás solo admin
                 .anyRequest().hasRole("ADMIN"))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
