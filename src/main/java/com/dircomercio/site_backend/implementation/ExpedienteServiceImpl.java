@@ -104,6 +104,7 @@ public class ExpedienteServiceImpl implements ExpedienteService {
         expediente.setFecha_inicio(LocalDate.now());
         expediente.setNroExp(nroExpediente);
         expediente.setCant_folios("0");
+        expediente.setDelegacion("DGC");
 
         Expediente expedienteGuardado = expedienteRepository.save(expediente);
 

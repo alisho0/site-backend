@@ -194,19 +194,20 @@ public class DenunciaServiceImpl implements DenunciaService {
             List<DenunciaEstado> historial = denunciaEstadoRepository.findByDenunciaOrderByFechaAsc(denuncia);
             String nuevoEstado = dto.getEstado();
             String nuevaObs = dto.getMotivo();
-            System.out.println("Entrando a actualizarEstadoDenuncia, usuario autenticado: " + SecurityContextHolder.getContext().getAuthentication());
+            System.out.println("Entrando a actualizarEstadoDenuncia, usuario autenticado: "
+                    + SecurityContextHolder.getContext().getAuthentication());
             // Validación de transición robusta
             boolean tuvoRechazado = historial.stream().anyMatch(
-                    e -> "RECHAZADA".equalsIgnoreCase(e.getEstado()) || "NO ADMITIDA".equalsIgnoreCase(e.getEstado()));
-            boolean tuvoProceso = historial.stream().anyMatch(e -> "EN PROCESO".equalsIgnoreCase(e.getEstado()));
+                    e -> "RECHAZADO".equalsIgnoreCase(e.getEstado()));
+            boolean tuvoProceso = historial.stream().anyMatch(e -> "ADMITIDO".equalsIgnoreCase(e.getEstado()));
             String ultimoEstado = historial.isEmpty() ? null : historial.get(historial.size() - 1).getEstado();
             String ultimaObs = historial.isEmpty() ? null : historial.get(historial.size() - 1).getObservacion();
 
-            if (tuvoRechazado && "EN PROCESO".equalsIgnoreCase(nuevoEstado)) {
+            if (tuvoRechazado && "ADMITIDO".equalsIgnoreCase(nuevoEstado)) {
                 throw new Exception(
-                        "No se puede cambiar el estado a 'EN PROCESO' si la denuncia ya fue rechazada o no admitida.");
+                        "No se puede cambiar el estado a 'ADMITIDO' si la denuncia ya fue rechazada.");
             }
-            if (!tuvoProceso && "EN PROCESO".equalsIgnoreCase(nuevoEstado)) {
+            if (!tuvoProceso && "ADMITIDO".equalsIgnoreCase(nuevoEstado)) {
                 expedienteService.crearExpedienteDesdeDenuncia(denuncia.getId());
             }
             // Evitar guardar el mismo estado dos veces seguidas salvo que la observación
@@ -217,10 +218,7 @@ public class DenunciaServiceImpl implements DenunciaService {
             }
 
             denuncia.setEstado(nuevoEstado);
-            String añoActual = String.valueOf(LocalDate.now().getYear());
-            String prefijo = "EXP" + "-" + añoActual + "-";
-            int cantExpedientes = expedienteRepository.countByNroExpStartingWith(prefijo);
-            String nroExpediente = prefijo + (cantExpedientes + 1);
+            Expediente expediente = denuncia.getExpediente();
             DenunciaEstado nuevo = DenunciaEstado.builder()
                     .denuncia(denuncia)
                     .estado(nuevoEstado)
@@ -234,10 +232,11 @@ public class DenunciaServiceImpl implements DenunciaService {
             String msjHtml = "<h2>Hola " + denuncia.getDenunciaPersonas().get(0).getPersona().getNombre() + ",</h2>"
                     + "<br>"
                     + "<p>Su denuncia ha cambiado de estado a <b>" + nuevoEstado + "</b>.</p>"
-                    + "<p>Podrás ver el estado de tu denuncia en el inicio con el siguiente código: " + nroExpediente
+                    + "<p>Podrás ver el estado de tu denuncia en el inicio con el siguiente código: "
+                    + expediente.getNroExp()
                     + "<br>"
                     + "<p><b>Motivo:</b> " + nuevaObs + "</p>";
-            emailService.enviarEmail(destinarario, asunto, msjHtml);
+            // emailService.enviarEmail(destinarario, asunto, msjHtml);
             return denunciaRepository.save(denuncia);
         } catch (Exception e) {
             throw new Exception("Hay un error al actualizar el estado de la denuncia: " + e.getMessage());
@@ -268,7 +267,7 @@ public class DenunciaServiceImpl implements DenunciaService {
                 + "<p>El estado de su denuncia es <b>" + denuncia.getEstado() + "</b>.</p>"
                 + "<br>"
                 + "<p><b>Observación:</b> " + observacion + "</p>";
-        emailService.enviarEmail(destinarario, asunto, msjHtml);
+        // emailService.enviarEmail(destinarario, asunto, msjHtml);
     }
 
     @Override
@@ -301,13 +300,13 @@ public class DenunciaServiceImpl implements DenunciaService {
                     personasDto.add(p);
                 }
                 DenunciaRespuestaDTO denunciaResp = DenunciaRespuestaDTO.builder()
-                    .id(exp.getDenuncia().getId())
-                    .descripcion(exp.getDenuncia().getDescripcion())
-                    .objeto(exp.getDenuncia().getObjeto())
-                    .motivo(exp.getDenuncia().getMotivo())
-                    .estado(exp.getDenuncia().getEstado())
-                    .personas(personasDto)
-                    .build();
+                        .id(exp.getDenuncia().getId())
+                        .descripcion(exp.getDenuncia().getDescripcion())
+                        .objeto(exp.getDenuncia().getObjeto())
+                        .motivo(exp.getDenuncia().getMotivo())
+                        .estado(exp.getDenuncia().getEstado())
+                        .personas(personasDto)
+                        .build();
                 denunciasResp.add(denunciaResp);
             }
             return denunciasResp;
@@ -318,27 +317,64 @@ public class DenunciaServiceImpl implements DenunciaService {
 
     @Override
     public List<DenunciaEstadoRespuestaDTO> traerHistorialDenuncia(Long id) throws Exception {
-    // 1) Busca la denuncia relacionada por nroExp
-    Denuncia denuncia = denunciaRepository.findById(id)
-            .orElseThrow(() -> new Exception("No se encontró la denuncia con el ID proporcionado"));
-    List<DenunciaEstado> historial = denunciaEstadoRepository.findByDenunciaOrderByFechaAsc(denuncia);
+        // 1) Busca la denuncia relacionada por nroExp
+        Denuncia denuncia = denunciaRepository.findById(id)
+                .orElseThrow(() -> new Exception("No se encontró la denuncia con el ID proporcionado"));
 
-    if (historial == null || historial.isEmpty()) {
-        throw new Exception("No se encontraron estados para la denuncia con id de Denuncia: " + id);
+        List<DenunciaEstado> historial = denunciaEstadoRepository.findByDenunciaOrderByFechaAsc(denuncia);
+
+        if (historial == null || historial.isEmpty()) {
+            throw new Exception("No se encontraron estados para la denuncia con id de Denuncia: " + id);
+        }
+
+        List<DenunciaEstadoRespuestaDTO> respuesta = new ArrayList<>();
+        for (DenunciaEstado estado : historial) {
+            DenunciaEstadoRespuestaDTO dto = new DenunciaEstadoRespuestaDTO();
+            dto.setEstado(estado.getEstado());
+            dto.setFecha(estado.getFecha());
+            dto.setObservacion(estado.getObservacion());
+            respuesta.add(dto);
+        }
+
+        return respuesta;
     }
 
-    List<DenunciaEstadoRespuestaDTO> respuesta = new ArrayList<>();
-    for (DenunciaEstado estado : historial) {
-        DenunciaEstadoRespuestaDTO dto = new DenunciaEstadoRespuestaDTO();
-        dto.setEstado(estado.getEstado());
-        dto.setFecha(estado.getFecha());
-        dto.setObservacion(estado.getObservacion());
-        respuesta.add(dto);
-    }   
+    public List<DenunciaRespuestaDTO> traerDenunciaPorUsuario() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<Expediente> expedientes = expedienteRepository.findByUsuarios_Email(email);
+        List<DenunciaRespuestaDTO> denunciasResp = new ArrayList<>();
 
-    return respuesta;
+        for (Expediente exp : expedientes) {
+            Denuncia denuncia = exp.getDenuncia();
+            DenunciaRespuestaDTO dto = new DenunciaRespuestaDTO();
+            dto.setId(denuncia.getId());
+            dto.setDescripcion(denuncia.getDescripcion());
+            dto.setObjeto(denuncia.getObjeto());
+            dto.setMotivo(denuncia.getMotivo());
+            dto.setEstado(denuncia.getEstado());
+
+            List<PersonaConRolDTO> personasDto = new ArrayList<>();
+            for (DenunciaPersona dp : denuncia.getDenunciaPersonas()) {
+                PersonaConRolDTO p = new PersonaConRolDTO();
+                p.setId(dp.getPersona().getId());
+                p.setNombre(dp.getPersona().getNombre());
+                p.setApellido(dp.getPersona().getApellido());
+                p.setEmail(dp.getPersona().getEmail());
+                p.setTelefono(dp.getPersona().getTelefono());
+                p.setCp(dp.getPersona().getCp());
+                p.setLocalidad(dp.getPersona().getLocalidad());
+                p.setDocumento(dp.getPersona().getDocumento());
+                p.setDomicilio(dp.getPersona().getDomicilio());
+                p.setFax(dp.getPersona().getFax());
+                p.setRol(dp.getRol());
+                p.setNombreDelegado(dp.getNombreDelegado());
+                p.setApellidoDelegado(dp.getApellidoDelegado());
+                p.setDniDelegado(dp.getDniDelegado());
+                personasDto.add(p);
+            }
+            dto.setPersonas(personasDto);
+            denunciasResp.add(dto);
+        }
+        return denunciasResp;
     }
-    
-    
-    
 }

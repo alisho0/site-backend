@@ -86,7 +86,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String rol = jwtService.extractRol(jwtToken);
         List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + rol.toUpperCase()));
         // Log para depuración de authorities
-        System.out.println("Authorities asignadas al usuario: " + authorities);
+        //System.out.println("Authorities asignadas al usuario: " + authorities);
 
         final var authToken = new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

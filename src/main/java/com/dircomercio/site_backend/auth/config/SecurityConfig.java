@@ -39,19 +39,19 @@ public class SecurityConfig {
             .authorizeHttpRequests(req -> 
             req
                 // Endpoints públicos
-                .requestMatchers(/* "/rol/**", "/auth/register",*/"/expediente/traerEstados/{nroExp}", "/auth/login", "/auth/logout", "/auth/refresh", "/denuncia/subirDenuncia", "/denuncia/traerDenunciaPorExp", "/auth/register").permitAll()
-                // Endpoints de mesa de entrada (y admin)
+                .requestMatchers("/expediente/traerEstados/{nroExp}", "/auth/login", "/auth/logout", "/auth/refresh", "/denuncia/subirDenuncia", "/auth/register", "/rol/**").permitAll()
+                // Endpoints de mesa de entrada, abogado
                 .requestMatchers(
                     "/denuncia/traerDenuncia",
                     "/denuncia/traerDenunciaPorId/{id}",
                     "/denuncia/actualizarEstado/{id}",
-                    "doc/traerPorDenuncia/{id}", "doc/traerPorId/{id}", "/usuarios/perfilUsuario", "/usuarios/actualizarNombre", "/usuarios/cambiarPassword", "/usuarios/traerUsuarios"
-                ).hasAnyRole("MESA_ENTRADA", "ADMIN", "ABOGADO")
+                    "doc/traerPorDenuncia/{id}", "doc/traerPorId/{id}", "/usuarios/perfilUsuario", "/usuarios/actualizarNombre", "/usuarios/cambiarPassword", "/denuncia/traerDenunciasPorUsuario", "/denuncia/historial/{id}"
+                ).hasAnyRole("MESA_ENTRADA", "ABOGADO", "ADMIN")
                 // Solo admin puede eliminar usuarios
                 .requestMatchers(HttpMethod.DELETE, "/usuarios/borrar/**").hasRole("ADMIN")
                 // Solo admin puede registrar
                 .requestMatchers(HttpMethod.POST, "/auth/register").hasRole("ADMIN")
-                .requestMatchers("/expediente/traerPorUsuario", "/expediente/traerExpedientePorId/{id}", "/pases/**", "/pases/traerPasesPorExp/{id}", "/audiencias/**").hasAnyRole("ADMIN", "ABOGADO")
+                .requestMatchers("/expediente/traerPorUsuario", "/expediente/traerExpedientePorId/{id}", "/pases/**", "/pases/traerPasesPorExp/{id}", "/audiencias/**", "/doc/traerOrdenesPorExpediente/{expedienteId}", "/doc/eliminarDoc/{id}", "/doc/crearOrden").hasAnyRole("ADMIN", "ABOGADO")
                 // Todo lo demás solo admin
                 .anyRequest().hasRole("ADMIN"))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

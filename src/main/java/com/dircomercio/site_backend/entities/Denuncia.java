@@ -35,7 +35,7 @@ public class Denuncia {
     @JsonProperty("motivo")
     private List<String> motivo;
     @Builder.Default
-    private String estado = "PENDIENTE";
+    private String estado = "EN ESPERA";
     
     @OneToMany(mappedBy = "denuncia", cascade = CascadeType.ALL)
     private List<DenunciaPersona> denunciaPersonas;

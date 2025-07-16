@@ -83,7 +83,7 @@ public class DocumentoController {
         }    
     }
 
-    @DeleteMapping("eliminarDoc/{id}")
+    @DeleteMapping("/eliminarDoc/{id}")
     public ResponseEntity<?> eliminarDocumento(@PathVariable Long id) {
         try {
             Documento documento = documentoService.obtenerPorId(id);

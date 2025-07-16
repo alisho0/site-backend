@@ -59,8 +59,9 @@ public class DenunciaController {
             ObjectMapper mapper = new ObjectMapper();
             DenunciaDTO denunciaDTO = mapper.readValue(denunciaJson, DenunciaDTO.class);
             denunciaService.guardarDenuncia(denunciaDTO, files);
-            System.out.println("Denuncia: " + denunciaDTO);
-            System.out.println("Personas: " + denunciaDTO.getPersonas());
+            // System.out.println("Denuncia: " + denunciaJson);
+            // System.out.println("Denuncia: " + denunciaDTO);
+            // System.out.println("Personas: " + denunciaDTO.getPersonas());
             return ResponseEntity.ok().body("La denuncia fue subida correctamente desde el controlador.");
         } catch (Exception e) {
             e.printStackTrace();
