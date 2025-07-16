@@ -20,7 +20,6 @@ import com.dircomercio.site_backend.repositories.RolRepository;
 import com.dircomercio.site_backend.repositories.UsuarioRepository;
 
 import lombok.RequiredArgsConstructor;
-import lombok.var;
 
 @Service
 @RequiredArgsConstructor
@@ -37,22 +36,22 @@ public class AuthService {
         Rol rol = rolRepository.findByNombre(request.rol())
             .orElseThrow(() -> new RuntimeException("Rol no encontrado: " + request.rol()));
 
-        var user = Usuario.builder()
+        Usuario user = Usuario.builder()
             .nombre(request.name())
             .email(request.email())
             .contraseña(passwordEncoder.encode(request.password()))
             .rol(rol)
             .build();
 
-        var savedUser = usuarioRepository.save(user);
-        var jwtToken = jwtService.generateToken(user);
-        var refreshToken = jwtService.generateRefreshToken(user);
+        Usuario savedUser = usuarioRepository.save(user);
+        String jwtToken = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
         saveUserToken(savedUser, jwtToken);
         return new TokenResponse(jwtToken, refreshToken);
     }
 
     public void saveUserToken(Usuario user, String jwtToken) {
-        var token = Token.builder()
+        Token token = Token.builder()
             .user(user)
             .token(jwtToken)
             .tokenType(Token.TokenType.BEARER)
@@ -97,13 +96,13 @@ public class AuthService {
                 request.password()
             )
         );
-        var user = usuarioRepository.findByEmail(request.email())
+        Usuario user = usuarioRepository.findByEmail(request.email())
             .orElseThrow(() -> new UsernameNotFoundException("No encontrado el usuario"));
         if (user == null) {
             throw new RuntimeException("Usuario no encontrado con email: " + request.email());
         }
-        var jwtToken = jwtService.generateToken(user);
-        var refreshToken = jwtService.generateRefreshToken(user);
+        String jwtToken = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
         revokeAllUserTokens(user);
         saveUserToken(user, jwtToken);
         return new TokenResponse(jwtToken, refreshToken);
