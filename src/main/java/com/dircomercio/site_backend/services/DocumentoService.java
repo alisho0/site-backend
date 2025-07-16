@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.dircomercio.site_backend.dtos.DocumentoRespuestaDTO;
+import com.dircomercio.site_backend.dtos.OrdenCreateDTO;
 import com.dircomercio.site_backend.dtos.OrdenRespuestaDTO;
 import com.dircomercio.site_backend.entities.Denuncia;
 import com.dircomercio.site_backend.entities.Documento;
@@ -20,4 +21,5 @@ public interface DocumentoService {
     Documento obtenerPorId(Long id) throws Exception;
 
     List<OrdenRespuestaDTO> traerOrdenesPorExpediente(Long expedienteId) throws Exception;
+    void crearOrden(List<MultipartFile> files, OrdenCreateDTO oDto) throws Exception;
 }

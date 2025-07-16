@@ -1,5 +1,6 @@
 package com.dircomercio.site_backend.entities;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -49,7 +50,7 @@ public class Pase {
     @JoinColumn(name = "usuario_id", nullable = true)
     private Usuario usuario;
 
-    @OneToMany(mappedBy = "pase")
+    @OneToMany(mappedBy = "pase", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Documento> documento;
 
 }

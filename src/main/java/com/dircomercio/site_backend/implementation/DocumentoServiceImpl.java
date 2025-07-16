@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.dircomercio.site_backend.dtos.DocumentoRespuestaDTO;
+import com.dircomercio.site_backend.dtos.OrdenCreateDTO;
 import com.dircomercio.site_backend.dtos.OrdenRespuestaDTO;
 import com.dircomercio.site_backend.entities.Denuncia;
 import com.dircomercio.site_backend.entities.Documento;
@@ -122,11 +123,13 @@ public class DocumentoServiceImpl implements DocumentoService {
 
         for (Documento doc : documentos) {
             OrdenRespuestaDTO ordenDto = OrdenRespuestaDTO.builder()
+                .id(doc.getId())
                 .tipoDocumento(doc.getTipoDocumento())
                 .nroDocumento(doc.getNombre())
                 .referencia(doc.getReferencia())
                 .fechaCreacion(doc.getFechaCreacion())
                 .orden(doc.getOrden())
+                .id_pase(doc.getPase() != null ? doc.getPase().getId() : null)
                 .build();
             ordenRespuesta.add(ordenDto);
         }
@@ -134,6 +137,17 @@ public class DocumentoServiceImpl implements DocumentoService {
             return ordenRespuesta;
         } else {
             throw new Exception("No se encontraron documentos para el expediente con ID: " + expedienteId);
+        }
+    }
+
+    public void crearOrden(List<MultipartFile> files, OrdenCreateDTO oDto) throws Exception {
+        Expediente expediente = expedienteRepository.findById(oDto.getExpedienteId())
+            .orElseThrow(() -> new Exception("No se encontró el expediente con ID: " + oDto.getExpedienteId()));
+        Denuncia denuncia = expediente.getDenuncia();
+        try {
+            guardarDocumentos(files, denuncia, null, oDto.getTipoDocumento());
+        } catch (Exception e) {
+            throw new Exception("Error al guardar documentos: " + e.getMessage());
         }
     }
     }
