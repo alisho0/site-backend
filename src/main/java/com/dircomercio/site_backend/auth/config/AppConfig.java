@@ -30,7 +30,7 @@ public class AppConfig {
         return username -> {
             final Usuario user = usuarioRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("No encontrado el usuario"));
-            String roleName = user.getRol() != null ? user.getRol().getNombre() : "USER";
+            String roleName = user.getRol() != null ? user.getRol().name() : "USER";
             return User.builder()
                 .username(user.getEmail())
                 .password(user.getContraseña())

@@ -14,6 +14,7 @@ import com.dircomercio.site_backend.auth.controller.RegisterRequest;
 import com.dircomercio.site_backend.auth.controller.TokenResponse;
 import com.dircomercio.site_backend.auth.repository.Token;
 import com.dircomercio.site_backend.auth.repository.TokenRepository;
+import com.dircomercio.site_backend.entities.Area;
 import com.dircomercio.site_backend.entities.Rol;
 import com.dircomercio.site_backend.entities.Usuario;
 import com.dircomercio.site_backend.repositories.RolRepository;
@@ -33,14 +34,18 @@ public class AuthService {
     private final RolRepository rolRepository;
 
     public TokenResponse register(RegisterRequest request) {
-        Rol rol = rolRepository.findByNombre(request.rol())
-            .orElseThrow(() -> new RuntimeException("Rol no encontrado: " + request.rol()));
+        Area area;
+        try {
+            area = Area.valueOf(request.rol().toUpperCase());
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Rol no válido: " + request.rol());
+        }
 
         Usuario user = Usuario.builder()
             .nombre(request.name())
             .email(request.email())
             .contraseña(passwordEncoder.encode(request.password()))
-            .rol(rol)
+            .rol(area)
             .build();
 
         Usuario savedUser = usuarioRepository.save(user);

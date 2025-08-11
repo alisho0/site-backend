@@ -46,14 +46,14 @@ public class SecurityConfig {
                     "/denuncia/traerDenunciaPorId/{id}",
                     "/denuncia/actualizarEstado/{id}",
                     "doc/traerPorDenuncia/{id}", "doc/traerPorId/{id}", "/usuarios/perfilUsuario", "/usuarios/actualizarNombre", "/usuarios/cambiarPassword", "/denuncia/traerDenunciasPorUsuario", "/denuncia/historial/{id}"
-                ).hasAnyRole("MESA_ENTRADA", "ABOGADO", "ADMIN")
+                ).hasAnyRole("MESA_DE_ENTRADA", "ABOGADO", "ADMIN", "DIRECCION")
                 // Solo admin puede eliminar usuarios
-                .requestMatchers(HttpMethod.DELETE, "/usuarios/borrar/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/usuarios/borrar/**").hasAnyRole("ADMIN", "DIRECCION")
                 // Solo admin puede registrar
-                .requestMatchers(HttpMethod.POST, "/auth/register").hasRole("ADMIN")
-                .requestMatchers("/expediente/traerPorUsuario", "/expediente/traerExpedientePorId/{id}", "/pases/**", "/pases/traerPasesPorExp/{id}", "/audiencias/**", "/doc/traerOrdenesPorExpediente/{expedienteId}", "/doc/eliminarDoc/{id}", "/doc/crearOrden").hasAnyRole("ADMIN", "ABOGADO")
+                .requestMatchers(HttpMethod.POST, "/auth/register").hasAnyRole("ADMIN", "DIRECCION")
+                .requestMatchers("/expediente/traerPorUsuario", "/expediente/traerExpedientePorId/{id}", "/pases/**", "/pases/traerPasesPorExp/{id}", "/audiencias/**", "/doc/traerOrdenesPorExpediente/{expedienteId}", "/doc/eliminarDoc/{id}", "/doc/crearOrden").hasAnyRole("ADMIN", "ABOGADO", "DIRECCION")
                 // Todo lo demás solo admin
-                .anyRequest().hasRole("ADMIN"))
+                .anyRequest().hasAnyRole("DIRECCION", "ADMIN"))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authenticationProvider(authenticationProvider)
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)

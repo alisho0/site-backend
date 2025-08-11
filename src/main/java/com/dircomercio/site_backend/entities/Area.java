@@ -4,5 +4,5 @@ public enum Area {
     MESA_DE_ENTRADA,
     ABOGADOS,
     DIRECCION,
-    ASESORIA_LEGAL
+    ASESORIA_LEGAL,
 }

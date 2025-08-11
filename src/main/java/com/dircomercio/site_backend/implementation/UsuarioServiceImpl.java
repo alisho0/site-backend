@@ -31,7 +31,7 @@ public class UsuarioServiceImpl {
                 .id(usuario.getId())
                 .email(usuario.getEmail())
                 .nombreUsuario(usuario.getNombre())
-                .rol(usuario.getRol() != null ? usuario.getRol().getNombre() : null)
+                .rol(usuario.getRol() != null ? usuario.getRol().name() : null)
                 .build();
             usuariosDTO.add(usu);
         }
@@ -66,7 +66,7 @@ public class UsuarioServiceImpl {
         return PerfilDTO.builder()
                 .nombre(usuario.getNombre())
                 .email(usuario.getEmail())
-                .area(usuario.getRol() != null ? usuario.getRol().getNombre() : null)
+                .area(usuario.getRol() != null ? usuario.getRol().name() : null)
                 .build();
     }
 

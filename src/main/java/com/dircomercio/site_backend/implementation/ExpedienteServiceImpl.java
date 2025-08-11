@@ -273,7 +273,7 @@ public class ExpedienteServiceImpl implements ExpedienteService {
         var usuario = authUtil.getUsuarioAutenticado();
         if (usuario == null) return false;
         var expediente = expedienteRepository.findById(expedienteId).orElse(null);
-        boolean esAdmin = usuario.getRol() != null && usuario.getRol().getNombre().equalsIgnoreCase("ADMIN");
+        boolean esAdmin = usuario.getRol() != null && usuario.getRol().name().equalsIgnoreCase("ADMIN");
         return expediente != null && (esAdmin || expediente.getUsuarios().contains(usuario));
     }
 }
