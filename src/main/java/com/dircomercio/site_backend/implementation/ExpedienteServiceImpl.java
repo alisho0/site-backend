@@ -96,9 +96,18 @@ public class ExpedienteServiceImpl implements ExpedienteService {
         //     throw new IllegalArgumentException("La denuncia no está aceptada");
         // }
         String añoActual = String.valueOf(LocalDate.now().getYear());
-        String prefijo = "EXP" + "-" + añoActual + "-";
-        int cantExpedientes = expedienteRepository.countByNroExpStartingWith(prefijo);
-        String nroExpediente = prefijo + (cantExpedientes + 1);
+        String prefijo = "EXP" + "-" + añoActual + "-" + "DGC" + "-";
+        // Buscar el último expediente del año actual
+        Expediente ultimoExpediente = expedienteRepository.findFirstByNroExpStartingWithOrderByNroExpDesc(prefijo);
+        int siguienteNumero;
+        if (ultimoExpediente == null) {
+            siguienteNumero = 1;
+        } else {
+            // Extraer el último número del expediente
+            String[] partes = ultimoExpediente.getNroExp().split("-");
+            siguienteNumero = Integer.parseInt(partes[partes.length - 1]) + 1;
+        }
+        String nroExpediente = prefijo + siguienteNumero;
         Expediente expediente = new Expediente();
         
         expediente.setFecha_inicio(LocalDate.now());
