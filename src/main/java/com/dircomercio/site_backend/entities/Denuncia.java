@@ -5,6 +5,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -36,6 +37,8 @@ public class Denuncia {
     private List<String> motivo;
     @Builder.Default
     private String estado = "EN ESPERA";
+    @Column(name = "notificar")
+    private Boolean notificar;    
     
     @OneToMany(mappedBy = "denuncia", cascade = CascadeType.ALL)
     private List<DenunciaPersona> denunciaPersonas;

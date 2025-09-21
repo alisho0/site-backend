@@ -1,6 +1,7 @@
 package com.dircomercio.site_backend.controllers;
 
 import java.util.List;
+import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import com.dircomercio.site_backend.dtos.DenunciaDTO;
 import com.dircomercio.site_backend.dtos.DenunciaEstadoRespuestaDTO;
 import com.dircomercio.site_backend.dtos.DenunciaRespuestaDTO;
 import com.dircomercio.site_backend.dtos.DenunciaUpdateDTO;
+import com.dircomercio.site_backend.entities.Denuncia;
 import com.dircomercio.site_backend.services.DenunciaService;
 import com.dircomercio.site_backend.services.DocumentoService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -119,4 +121,19 @@ public class DenunciaController {
             throw new Exception("Hubo un problema al mandar el correo: " + e.getMessage());
         }
     }
+    @PostMapping
+    public ResponseEntity<String> crearDenuncia(
+        @RequestBody DenunciaDTO denunciaDTO) {
+
+        try {
+             // Llamamos al service, sin archivos por ahora (puede ser null)
+             denunciaService.guardarDenuncia(denunciaDTO, new ArrayList<>());
+
+             return ResponseEntity.ok("Denuncia creada con éxito");
+         } catch (Exception e) {
+             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+         }
+    }
 }
+
+

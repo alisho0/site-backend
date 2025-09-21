@@ -76,6 +76,8 @@ public class DenunciaServiceImpl implements DenunciaService {
             denuncia.setDescripcion(denunciaDTO.getDescripcion());
             denuncia.setObjeto(denunciaDTO.getObjeto());
             denuncia.setMotivo(denunciaDTO.getMotivo());
+            // Guardamos el valor de notificar, asegurando que no quede null
+            denuncia.setNotificar(denunciaDTO.getNotificar() != null ? denunciaDTO.getNotificar() : false);
             denunciaRepository.save(denuncia);
 
             // Aquí se crean (si es que no existen) y vinculan las personas a la denuncia
