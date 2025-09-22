@@ -121,19 +121,6 @@ public class DenunciaController {
             throw new Exception("Hubo un problema al mandar el correo: " + e.getMessage());
         }
     }
-    @PostMapping
-    public ResponseEntity<String> crearDenuncia(
-        @RequestBody DenunciaDTO denunciaDTO) {
-
-        try {
-             // Llamamos al service, sin archivos por ahora (puede ser null)
-             denunciaService.guardarDenuncia(denunciaDTO, new ArrayList<>());
-
-             return ResponseEntity.ok("Denuncia creada con éxito");
-         } catch (Exception e) {
-             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
-         }
-    }
 }
 
 
