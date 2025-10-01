@@ -1,7 +1,5 @@
 package com.dircomercio.site_backend.dtos;
 
-import java.time.LocalDate;
-
 import com.dircomercio.site_backend.entities.Area;
 import com.dircomercio.site_backend.entities.TipoDocumento;
 

@@ -15,8 +15,10 @@ import com.dircomercio.site_backend.auth.controller.TokenResponse;
 import com.dircomercio.site_backend.auth.repository.Token;
 import com.dircomercio.site_backend.auth.repository.TokenRepository;
 import com.dircomercio.site_backend.entities.Area;
+import com.dircomercio.site_backend.entities.Persona;
 import com.dircomercio.site_backend.entities.Rol;
 import com.dircomercio.site_backend.entities.Usuario;
+import com.dircomercio.site_backend.repositories.PersonaRepository;
 import com.dircomercio.site_backend.repositories.RolRepository;
 import com.dircomercio.site_backend.repositories.UsuarioRepository;
 
@@ -32,6 +34,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final RolRepository rolRepository;
+    private final PersonaRepository personaRepository;
 
     public TokenResponse register(RegisterRequest request) {
         Area area;
@@ -41,13 +44,26 @@ public class AuthService {
             throw new IllegalArgumentException("Rol no válido: " + request.rol());
         }
 
+        Persona persona = Persona.builder()
+            .nombre(request.nombre())
+            .apellido(request.apellido())
+            .email(request.email())
+            .telefono(request.telefono())
+            .cp(request.cp())
+            .localidad(request.localidad())
+            .documento(request.documento())
+            .domicilio(request.domicilio())
+            .build();
+
         Usuario user = Usuario.builder()
             .nombre(request.name())
             .email(request.email())
             .contraseña(passwordEncoder.encode(request.password()))
             .rol(area)
+            .persona(persona)
             .build();
-
+            
+        personaRepository.save(persona);
         Usuario savedUser = usuarioRepository.save(user);
         String jwtToken = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);

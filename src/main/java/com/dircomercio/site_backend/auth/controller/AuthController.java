@@ -26,9 +26,9 @@ public class AuthController {
     public ResponseEntity<TokenResponse> register(@RequestBody final RegisterRequest request) {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            System.out.println("[DEBUG] Authorities en el método: " + auth.getAuthorities());
-            System.out.println("[LOG] Se recibió petición POST /auth/register");
-            System.out.println("[LOG] Datos recibidos: email=" + request.email() + ", name=" + request.name() + ", rol=" + request.rol());
+            // System.out.println("[DEBUG] Authorities en el método: " + auth.getAuthorities());
+            // System.out.println("[LOG] Se recibió petición POST /auth/register");
+            // System.out.println("[LOG] Datos recibidos: email=" + request.email() + ", name=" + request.name() + ", rol=" + request.rol());
             final TokenResponse token = service.register(request);
             return ResponseEntity.ok(token);
         } catch (Exception e) {
