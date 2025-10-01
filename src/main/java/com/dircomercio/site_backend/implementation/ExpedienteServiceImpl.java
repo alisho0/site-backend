@@ -163,7 +163,6 @@ public class ExpedienteServiceImpl implements ExpedienteService {
                 p.setLocalidad(dp.getPersona().getLocalidad());
                 p.setDocumento(dp.getPersona().getDocumento());
                 p.setDomicilio(dp.getPersona().getDomicilio());
-                p.setFax(dp.getPersona().getFax());
                 p.setRol(dp.getRol());
                 p.setNombreDelegado(dp.getNombreDelegado());
                 p.setApellidoDelegado(dp.getApellidoDelegado());

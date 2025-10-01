@@ -1,6 +1,5 @@
 package com.dircomercio.site_backend.implementation;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -130,7 +129,6 @@ public class DenunciaServiceImpl implements DenunciaService {
                     p.setLocalidad(dp.getPersona().getLocalidad());
                     p.setDocumento(dp.getPersona().getDocumento());
                     p.setDomicilio(dp.getPersona().getDomicilio());
-                    p.setFax(dp.getPersona().getFax());
                     p.setRol(dp.getRol());
                     p.setNombreDelegado(dp.getNombreDelegado());
                     p.setApellidoDelegado(dp.getApellidoDelegado());
@@ -171,7 +169,6 @@ public class DenunciaServiceImpl implements DenunciaService {
                 p.setLocalidad(dp.getPersona().getLocalidad());
                 p.setDocumento(dp.getPersona().getDocumento());
                 p.setDomicilio(dp.getPersona().getDomicilio());
-                p.setFax(dp.getPersona().getFax());
                 p.setRol(dp.getRol());
                 p.setNombreDelegado(dp.getNombreDelegado());
                 p.setApellidoDelegado(dp.getApellidoDelegado());
@@ -292,7 +289,6 @@ public class DenunciaServiceImpl implements DenunciaService {
                     p.setLocalidad(dp.getPersona().getLocalidad());
                     p.setDocumento(dp.getPersona().getDocumento());
                     p.setDomicilio(dp.getPersona().getDomicilio());
-                    p.setFax(dp.getPersona().getFax());
                     p.setRol(dp.getRol());
                     p.setNombreDelegado(dp.getNombreDelegado());
                     p.setApellidoDelegado(dp.getApellidoDelegado());
@@ -365,7 +361,6 @@ public class DenunciaServiceImpl implements DenunciaService {
                 p.setLocalidad(dp.getPersona().getLocalidad());
                 p.setDocumento(dp.getPersona().getDocumento());
                 p.setDomicilio(dp.getPersona().getDomicilio());
-                p.setFax(dp.getPersona().getFax());
                 p.setRol(dp.getRol());
                 p.setNombreDelegado(dp.getNombreDelegado());
                 p.setApellidoDelegado(dp.getApellidoDelegado());
