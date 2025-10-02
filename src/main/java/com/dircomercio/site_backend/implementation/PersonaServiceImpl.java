@@ -28,7 +28,7 @@ public class PersonaServiceImpl implements PersonaService {
         for (PersonaRolDTO personaRol : personas) {
             Persona persona = personaRol.getPersona();
             if (persona != null) {
-                Persona existente = personaRepository.findByDocumento(persona.getDocumento());
+                Persona existente = personaRepository.findByDocumento(persona.getDocumento()).orElse(null);
                 if (existente != null) {
                     listaPersonas.add(existente);
                 } else {

@@ -43,6 +43,27 @@ public class AuthService {
         } catch (Exception e) {
             throw new IllegalArgumentException("Rol no válido: " + request.rol());
         }
+        if (usuarioRepository.existsByEmail(request.email())) {
+            throw new IllegalArgumentException("El email ya está en uso: " + request.email());
+        }
+
+        Persona personaExistente = personaRepository.findByDocumento(request.documento())
+            .orElseThrow(() -> new IllegalArgumentException("Documento no válido: " + request.documento()));
+        if (personaExistente != null) {
+            // Si la persona ya existe, la usamos
+            Usuario user = Usuario.builder()
+                .nombre(request.name())
+                .email(request.email())
+                .contraseña(passwordEncoder.encode(request.password()))
+                .rol(area)
+                .persona(personaExistente)
+                .build();
+            Usuario savedUser = usuarioRepository.save(user);
+            String jwtToken = jwtService.generateToken(user);
+            String refreshToken = jwtService.generateRefreshToken(user);
+            saveUserToken(savedUser, jwtToken);
+            return new TokenResponse(jwtToken, refreshToken);
+        }
 
         Persona persona = Persona.builder()
             .nombre(request.nombre())
