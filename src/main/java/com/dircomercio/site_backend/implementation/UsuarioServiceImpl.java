@@ -11,17 +11,20 @@ import org.springframework.stereotype.Service;
 import com.dircomercio.site_backend.dtos.CambiarPasswordDTO;
 import com.dircomercio.site_backend.dtos.PerfilDTO;
 import com.dircomercio.site_backend.dtos.UsuarioDTO;
+import com.dircomercio.site_backend.entities.Persona;
 import com.dircomercio.site_backend.entities.Usuario;
+import com.dircomercio.site_backend.repositories.PersonaRepository;
 import com.dircomercio.site_backend.repositories.UsuarioRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class UsuarioServiceImpl {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final PersonaRepository personaRepository;
 
     public List<UsuarioDTO> traerUsuarios() {
         List<Usuario> usuarios = (List<Usuario>) usuarioRepository.findAll();
@@ -48,14 +51,24 @@ public class UsuarioServiceImpl {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Usuario usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        System.out.println("Nombre recibido: '" + perfilDTO.getNombre() + "'");
-        System.out.println("Nombre del backend: '" + usuario.getNombre() + "'");
+        Persona persona = usuario.getPersona();
+        if (persona == null) {
+            throw new RuntimeException("La persona asociada al usuario no existe");
+        }
 
         if (perfilDTO.getNombre() == null || perfilDTO.getNombre().trim().isEmpty()) {
             throw new IllegalArgumentException("El nombre no puede ser vacío");
         }
-        usuario.setNombre(perfilDTO.getNombre());
+        usuario.setNombre(perfilDTO.getName());
+        persona.setNombre(perfilDTO.getNombre());
+        persona.setApellido(perfilDTO.getApellido());
+        persona.setDocumento(perfilDTO.getDocumento());
+        persona.setTelefono(perfilDTO.getTelefono());
+        persona.setDomicilio(perfilDTO.getDomicilio());
+        persona.setLocalidad(perfilDTO.getLocalidad());
+        persona.setCp(perfilDTO.getCp());
         usuarioRepository.save(usuario);
+        personaRepository.save(persona);
     }
 
     public PerfilDTO obtenerPerfil() throws Exception {
@@ -64,9 +77,16 @@ public class UsuarioServiceImpl {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         
         return PerfilDTO.builder()
-                .nombre(usuario.getNombre())
+                .name(usuario.getNombre())
                 .email(usuario.getEmail())
                 .area(usuario.getRol() != null ? usuario.getRol().name() : null)
+                .nombre(usuario.getPersona() != null ? usuario.getPersona().getNombre() : null)
+                .apellido(usuario.getPersona() != null ? usuario.getPersona().getApellido() : null)
+                .documento(usuario.getPersona() != null ? usuario.getPersona().getDocumento() : null)
+                .telefono(usuario.getPersona() != null ? usuario.getPersona().getTelefono() : null)
+                .domicilio(usuario.getPersona() != null ? usuario.getPersona().getDomicilio() : null)
+                .localidad(usuario.getPersona() != null ? usuario.getPersona().getLocalidad() : null)
+                .cp(usuario.getPersona() != null ? usuario.getPersona().getCp() : null)
                 .build();
     }
 

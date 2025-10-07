@@ -48,7 +48,7 @@ public class AuthService {
         }
 
         Persona personaExistente = personaRepository.findByDocumento(request.documento())
-            .orElseThrow(() -> new IllegalArgumentException("Documento no válido: " + request.documento()));
+            .orElse(null);
         if (personaExistente != null) {
             // Si la persona ya existe, la usamos
             Usuario user = Usuario.builder()
