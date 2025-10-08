@@ -1,5 +1,7 @@
 package com.dircomercio.site_backend.auth.config;
 
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -13,6 +15,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.dircomercio.site_backend.auth.repository.Token;
 import com.dircomercio.site_backend.auth.repository.TokenRepository;
@@ -30,11 +35,29 @@ public class SecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
     private final TokenRepository tokenRepository;
 
+    /*                 registry.addMapping("/**")
+                    .allowedOrigins("http://localhost:8080", "http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "https://site-backend-f8xg.onrender.com", "https://frontend-site-theta.vercel.app")
+                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                    .allowedHeaders("*")
+                    .allowCredentials(true);
+                    */
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:8080"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+        configuration.setAllowedHeaders(List.of("*")); // Esto permite todos los headers
+        configuration.setAllowCredentials(true); // Si se necesita enviar a futuro cookies o headers de autenticación
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration); // Primero permite todas las rutas para desarrollo y después le pasa toda la configuración de CORS
+        return source;
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception { 
         http
-            .cors()
-            .and()
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(AbstractHttpConfigurer::disable) // Deshabilitar CSRF para simplificar (considerar habilitar en producción) 
             .authorizeHttpRequests(req -> 
             req
