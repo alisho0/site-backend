@@ -3,7 +3,6 @@ package com.dircomercio.site_backend.implementation;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -41,24 +40,35 @@ public class UsuarioServiceImpl {
         return usuariosDTO;
     }
 
-    public void borrarUsuario(Long id) throws Exception {
-        Usuario usu = usuarioRepository.findById(id)
-            .orElseThrow(() -> new Exception("Usuario no encontrado"));
-        usuarioRepository.deleteById(usu.getId());
+    public PerfilDTO traerUsuarioPorId(Long id) throws Exception {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new Exception("Usuario no encontrado con ID: " + id));
+
+        Persona persona = usuario.getPersona();
+
+        return PerfilDTO.builder()
+                .name(usuario.getNombre())
+                .email(usuario.getEmail())
+                .area(usuario.getRol() != null ? usuario.getRol().name() : null)
+                .nombre(persona != null ? persona.getNombre() : null)
+                .apellido(persona != null ? persona.getApellido() : null)
+                .documento(persona != null ? persona.getDocumento() : null)
+                .telefono(persona != null ? persona.getTelefono() : null)
+                .domicilio(persona != null ? persona.getDomicilio() : null)
+                .localidad(persona != null ? persona.getLocalidad() : null)
+                .cp(persona != null ? persona.getCp() : null)
+                .build();
     }
 
-    public void actualizarPerfil(PerfilDTO perfilDTO) throws Exception {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        Usuario usuario = usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    public void actualizarUsuarioPorId(Long id, PerfilDTO perfilDTO) throws Exception {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
+        
         Persona persona = usuario.getPersona();
         if (persona == null) {
             throw new RuntimeException("La persona asociada al usuario no existe");
         }
 
-        if (perfilDTO.getNombre() == null || perfilDTO.getNombre().trim().isEmpty()) {
-            throw new IllegalArgumentException("El nombre no puede ser vacío");
-        }
         usuario.setNombre(perfilDTO.getName());
         persona.setNombre(perfilDTO.getNombre());
         persona.setApellido(perfilDTO.getApellido());
@@ -67,29 +77,64 @@ public class UsuarioServiceImpl {
         persona.setDomicilio(perfilDTO.getDomicilio());
         persona.setLocalidad(perfilDTO.getLocalidad());
         persona.setCp(perfilDTO.getCp());
+        
         usuarioRepository.save(usuario);
         personaRepository.save(persona);
     }
 
+    public void borrarUsuario(Long id) throws Exception {
+        Usuario usu = usuarioRepository.findById(id)
+                .orElseThrow(() -> new Exception("Usuario no encontrado"));
+        usuarioRepository.deleteById(usu.getId());
+    }
+
+    // --- MÉTODO CORREGIDO ---
+    public void actualizarPerfil(PerfilDTO perfilDTO) throws Exception {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        
+        Persona persona = usuario.getPersona();
+        if (persona == null) {
+            throw new RuntimeException("La persona asociada al usuario no existe");
+        }
+
+        usuario.setNombre(perfilDTO.getName());
+        persona.setNombre(perfilDTO.getNombre());
+        persona.setApellido(perfilDTO.getApellido());
+        persona.setDocumento(perfilDTO.getDocumento());
+        persona.setTelefono(perfilDTO.getTelefono());
+        persona.setDomicilio(perfilDTO.getDomicilio());
+        persona.setLocalidad(perfilDTO.getLocalidad());
+        persona.setCp(perfilDTO.getCp());
+
+        usuarioRepository.save(usuario);
+        personaRepository.save(persona);
+    }
+
+    // --- MÉTODO CORREGIDO ---
     public PerfilDTO obtenerPerfil() throws Exception {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Usuario usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         
+        Persona persona = usuario.getPersona();
+
         return PerfilDTO.builder()
                 .name(usuario.getNombre())
                 .email(usuario.getEmail())
                 .area(usuario.getRol() != null ? usuario.getRol().name() : null)
-                .nombre(usuario.getPersona() != null ? usuario.getPersona().getNombre() : null)
-                .apellido(usuario.getPersona() != null ? usuario.getPersona().getApellido() : null)
-                .documento(usuario.getPersona() != null ? usuario.getPersona().getDocumento() : null)
-                .telefono(usuario.getPersona() != null ? usuario.getPersona().getTelefono() : null)
-                .domicilio(usuario.getPersona() != null ? usuario.getPersona().getDomicilio() : null)
-                .localidad(usuario.getPersona() != null ? usuario.getPersona().getLocalidad() : null)
-                .cp(usuario.getPersona() != null ? usuario.getPersona().getCp() : null)
+                .nombre(persona != null ? persona.getNombre() : null)
+                .apellido(persona != null ? persona.getApellido() : null)
+                .documento(persona != null ? persona.getDocumento() : null)
+                .telefono(persona != null ? persona.getTelefono() : null)
+                .domicilio(persona != null ? persona.getDomicilio() : null)
+                .localidad(persona != null ? persona.getLocalidad() : null)
+                .cp(persona != null ? persona.getCp() : null)
                 .build();
     }
 
+    // --- MÉTODO CORREGIDO ---
     public void cambiarPassword(CambiarPasswordDTO dto) throws Exception {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Usuario usuario = usuarioRepository.findByEmail(email)
@@ -110,11 +155,9 @@ public class UsuarioServiceImpl {
         usuario.setContraseña(passwordEncoder.encode(dto.getNueva()));
         usuarioRepository.save(usuario);
     }
-
-
-    // Valida la contraseña según los requisitos
+    
     private boolean validarPassword(String password) {
-        // Requisitos: mínimo 8, una mayúscula, un número
         return password != null && password.matches("^(?=.*[A-Z])(?=.*\\d).{8,}$");
     }
 }
+

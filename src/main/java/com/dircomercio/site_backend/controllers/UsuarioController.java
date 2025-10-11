@@ -12,22 +12,17 @@ import com.dircomercio.site_backend.repositories.UsuarioRepository;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.http.ResponseEntity;
 
 
 @RestController
 @RequestMapping("/usuarios")
 public class UsuarioController {
-
-    @Autowired
-    UsuarioRepository usuarioRepository;
 
     @Autowired
     private UsuarioServiceImpl usuarioServiceImpl;
@@ -41,9 +36,31 @@ public class UsuarioController {
             return ResponseEntity.badRequest().body("Error obteniendo los usuarios: "+ e.getMessage());
         }
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> traerUsuarioPorId(@PathVariable Long id) {
+        try {
+            PerfilDTO perfil = usuarioServiceImpl.traerUsuarioPorId(id);
+            return ResponseEntity.ok(perfil);
+        } catch (Exception e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
+    }
     
+    // --- ESTE ES EL MÉTODO QUE FALTABA ---
+    @PutMapping("/{id}")
+    public ResponseEntity<String> actualizarUsuario(@PathVariable Long id, @RequestBody PerfilDTO perfilDTO) {
+        try {
+            // Pasamos el ID y los datos al servicio para que actualice al usuario correcto
+            usuarioServiceImpl.actualizarUsuarioPorId(id, perfilDTO); 
+            return ResponseEntity.ok("Usuario actualizado correctamente");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al actualizar el usuario: " + e.getMessage());
+        }
+    }
+
     @DeleteMapping("/borrar/{id}")
-    public ResponseEntity<String> borrarUsuario(@PathVariable Long id) throws Exception {
+    public ResponseEntity<String> borrarUsuario(@PathVariable Long id) {
         try {
             usuarioServiceImpl.borrarUsuario(id);
             return ResponseEntity.ok("Usuario borrado correctamente");
@@ -53,7 +70,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/perfilUsuario")
-    public ResponseEntity<PerfilDTO> obtenerPerfil() {
+    public ResponseEntity<?> obtenerPerfil() {
         try {
             PerfilDTO perfil = usuarioServiceImpl.obtenerPerfil();
             return ResponseEntity.ok(perfil);
@@ -62,13 +79,14 @@ public class UsuarioController {
         }
     }
 
+    // Este método es para que el propio usuario actualice su perfil, lo dejamos por si se usa en "Ajustes"
     @PutMapping("/actualizarNombre")
     public ResponseEntity<String> actualizarNombre(@RequestBody PerfilDTO perfilDTO) {
         try {
             usuarioServiceImpl.actualizarPerfil(perfilDTO);
-            return ResponseEntity.ok("Nombre actualizado correctamente");
+            return ResponseEntity.ok("Perfil actualizado correctamente");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error al actualizar el nombre: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Error al actualizar el perfil: " + e.getMessage());
         }
     }
 

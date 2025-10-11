@@ -30,27 +30,19 @@ import lombok.RequiredArgsConstructor;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    
     private final AuthenticationProvider authenticationProvider;
     private final JwtAuthFilter jwtAuthFilter;
     private final TokenRepository tokenRepository;
-
-    /*                 registry.addMapping("/**")
-                    .allowedOrigins("http://localhost:8080", "http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "https://site-backend-f8xg.onrender.com", "https://frontend-site-theta.vercel.app")
-                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                    .allowedHeaders("*")
-                    .allowCredentials(true);
-                    */
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:8080"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
-        configuration.setAllowedHeaders(List.of("*")); // Esto permite todos los headers
-        configuration.setAllowCredentials(true); // Si se necesita enviar a futuro cookies o headers de autenticación
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration); // Primero permite todas las rutas para desarrollo y después le pasa toda la configuración de CORS
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 
@@ -58,24 +50,31 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception { 
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(AbstractHttpConfigurer::disable) // Deshabilitar CSRF para simplificar (considerar habilitar en producción) 
+            .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(req -> 
             req
                 // Endpoints públicos
-                .requestMatchers("/expediente/traerEstados/{nroExp}", "/auth/login", "/auth/logout", "/auth/refresh", "/denuncia/subirDenuncia", "/auth/register", "/rol/**").permitAll()
-                // Endpoints de mesa de entrada, abogado
+                .requestMatchers("/expediente/traerEstados/{nroExp}", "/auth/login", "/auth/logout", "/auth/refresh", "/denuncia/subirDenuncia", "/rol/**").permitAll()
+                
+                // Endpoints generales para usuarios logueados
                 .requestMatchers(
                     "/denuncia/traerDenuncia",
                     "/denuncia/traerDenunciaPorId/{id}",
                     "/denuncia/actualizarEstado/{id}",
                     "doc/traerPorDenuncia/{id}", "doc/traerPorId/{id}", "/usuarios/perfilUsuario", "/usuarios/actualizarNombre", "/usuarios/cambiarPassword", "/denuncia/traerDenunciasPorUsuario", "/denuncia/historial/{id}"
                 ).hasAnyRole("MESA_DE_ENTRADA", "ABOGADO", "ADMIN", "DIRECCION")
-                // Solo admin puede eliminar usuarios
-                .requestMatchers(HttpMethod.DELETE, "/usuarios/borrar/**").hasAnyRole("ADMIN", "DIRECCION")
-                // Solo admin puede registrar
-                .requestMatchers(HttpMethod.POST, "/auth/register").hasAnyRole("ADMIN", "DIRECCION")
+
+                // --- REGLAS ESPECÍFICAS PARA EL CRUD DE USUARIOS ---
+                .requestMatchers(HttpMethod.GET, "/usuarios/traerUsuarios").hasAnyRole("ADMIN", "DIRECCION")
+                .requestMatchers(HttpMethod.GET, "/usuarios/{id}").hasAnyRole("ADMIN", "DIRECCION") // Ver detalles
+                .requestMatchers(HttpMethod.PUT, "/usuarios/{id}").hasAnyRole("ADMIN", "DIRECCION") // Editar
+                .requestMatchers(HttpMethod.DELETE, "/usuarios/borrar/**").hasAnyRole("ADMIN", "DIRECCION") // Borrar
+                .requestMatchers(HttpMethod.POST, "/auth/register").hasAnyRole("ADMIN", "DIRECCION") // Crear
+
+                // Reglas para Expedientes, Pases, etc.
                 .requestMatchers("/expediente/traerPorUsuario", "/expediente/traerExpedientePorId/{id}", "/pases/**", "/pases/traerPasesPorExp/{id}", "/audiencias/**", "/doc/traerOrdenesPorExpediente/{expedienteId}", "/doc/eliminarDoc/{id}", "/doc/crearOrden").hasAnyRole("ADMIN", "ABOGADO", "DIRECCION")
-                // Todo lo demás solo admin
+                
+                // Regla final: cualquier otra petición requiere ser ADMIN o DIRECCION
                 .anyRequest().hasAnyRole("DIRECCION", "ADMIN"))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authenticationProvider(authenticationProvider)
@@ -87,22 +86,21 @@ public class SecurityConfig {
                         logout(authHeader);
                     })
                     .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
-                );
+            );
         return http.build();
     }
 
     private void logout(final String token) {
         if (token == null || !token.startsWith("Bearer ")) {
-            throw new IllegalArgumentException("Token invalido");
+            return; // No hacer nada si no hay token
         }
-
         final String jwtToken = token.substring(7);
         final Token foundToken = tokenRepository.findByToken(jwtToken);
-        if (foundToken == null) {
-            throw new IllegalArgumentException("Token invalido");
+        if (foundToken != null) {
+            foundToken.setExpired(true);
+            foundToken.setRevoked(true);
+            tokenRepository.save(foundToken);
         }
-        foundToken.setExpired(true);
-        foundToken.setRevoked(true);
-        tokenRepository.save(foundToken);
     }
 }
+
