@@ -54,7 +54,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(req -> 
             req
                 // Endpoints públicos
-                .requestMatchers("/expediente/traerEstados/{nroExp}", "/auth/login", "/auth/logout", "/auth/refresh", "/denuncia/subirDenuncia", "/rol/**").permitAll()
+                .requestMatchers("/expediente/traerEstados/{nroExp}", "/auth/login", "/auth/register", "/auth/logout", "/auth/refresh", "/denuncia/subirDenuncia", "/rol/**").permitAll()
                 
                 // Endpoints generales para usuarios logueados
                 .requestMatchers(
