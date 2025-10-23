@@ -54,6 +54,26 @@ public class SecurityConfig {
             .authorizeHttpRequests(req -> 
             req
                 // Endpoints públicos
+                .requestMatchers(
+            "/",
+            "/index.html",
+            "/assets/**",
+            "/Logo.svg",
+            "/Logo.png",
+            "/vite.svg",
+            "/**/*.js",
+            "/**/*.mjs",
+            "/**/*.css",
+            "/**/*.svg",
+            "/**/*.png",
+            "/**/*.jpg",
+            "/**/*.jpeg",
+            "/**/*.gif",
+            "/**/*.ico",
+            "/**/*.woff",
+            "/**/*.woff2",
+            "/**/*.ttf",
+            "/manifest.json").permitAll()
                 .requestMatchers("/expediente/traerEstados/{nroExp}", "/auth/login", "/auth/register", "/auth/logout", "/auth/refresh", "/denuncia/subirDenuncia", "/rol/**").permitAll()
                 
                 // Endpoints generales para usuarios logueados
