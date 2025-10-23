@@ -59,6 +59,7 @@ public class SecurityConfig {
             "/index.html",
             "/assets/**",
             "/Logo.svg",
+            "/**/*.avif",
             "/Logo.png",
             "/vite.svg",
             "/**/*.js",
