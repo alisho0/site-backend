@@ -29,6 +29,7 @@ public class Documento {
     private Long id;
     @Enumerated(EnumType.STRING)
     private TipoDocumento tipoDocumento;
+    private String nombrevisible;
     private String nombre;
     private LocalDateTime fechaCreacion;
     private String referencia;

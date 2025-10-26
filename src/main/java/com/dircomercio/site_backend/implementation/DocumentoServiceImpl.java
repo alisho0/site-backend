@@ -4,6 +4,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -68,10 +69,16 @@ public class DocumentoServiceImpl implements DocumentoService {
                 documento.setRuta(path.toString());
                 documento.setDenuncia(denuncia);
                 documento.setPase(pase);
+
+                String fechaNombre = LocalDate.now().toString();
                 if (tipoDocumento != null) {
                     documento.setTipoDocumento(tipoDocumento);
+                    String nombreVisible = tipoDocumento + "_" + (denuncia.getId() != null ? denuncia.getId() : "0") + "_" + fechaNombre + ".pdf";
+                    documento.setNombrevisible(nombreVisible);
                 } else {
                     documento.setTipoDocumento(TipoDocumento.DATOS_DENUNCIA); // Asigna un tipo por defecto si no se especifica
+                    String nombreVisible = TipoDocumento.DATOS_DENUNCIA + "_" + (denuncia.getId() != null ? denuncia.getId() : "0") + "_" + fechaNombre + ".pdf";
+                    documento.setNombrevisible(nombreVisible);
                 }
                 if (pase != null) {
                     documento.setReferencia("Pase");
@@ -129,6 +136,7 @@ public class DocumentoServiceImpl implements DocumentoService {
                 .referencia(doc.getReferencia())
                 .fechaCreacion(doc.getFechaCreacion())
                 .orden(doc.getOrden())
+                .nombreVisible(doc.getNombrevisible() != null ? doc.getNombrevisible() : null)
                 .id_pase(doc.getPase() != null ? doc.getPase().getId() : null)
                 .build();
             ordenRespuesta.add(ordenDto);
