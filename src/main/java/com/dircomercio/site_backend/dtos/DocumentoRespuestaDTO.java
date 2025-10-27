@@ -11,4 +11,5 @@ public class DocumentoRespuestaDTO {
     private Long id;
     private String nombre;
     private String formato;
+    private String nombreVisible;
 }

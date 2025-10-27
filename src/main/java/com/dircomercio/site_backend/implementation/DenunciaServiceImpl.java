@@ -75,6 +75,7 @@ public class DenunciaServiceImpl implements DenunciaService {
             denuncia.setDescripcion(denunciaDTO.getDescripcion());
             denuncia.setObjeto(denunciaDTO.getObjeto());
             denuncia.setMotivo(denunciaDTO.getMotivo());
+            denuncia.setNotificar(denunciaDTO.getNotificar());
             denunciaRepository.save(denuncia);
 
             // Aquí se crean (si es que no existen) y vinculan las personas a la denuncia
@@ -156,6 +157,7 @@ public class DenunciaServiceImpl implements DenunciaService {
             dto.setEstado(denuncia.getEstado());
             dto.setMotivo(denuncia.getMotivo());
             dto.setObjeto(denuncia.getObjeto());
+            dto.setNotificar(denuncia.getNotificar());
 
             List<PersonaConRolDTO> personas = new ArrayList<>();
             for (DenunciaPersona dp : denuncia.getDenunciaPersonas()) {

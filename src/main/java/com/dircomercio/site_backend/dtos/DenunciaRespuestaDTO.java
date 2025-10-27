@@ -18,4 +18,5 @@ public class DenunciaRespuestaDTO {
     private List<String> motivo;
     private String estado;
     private List<PersonaConRolDTO> personas;
+    private Boolean notificar;
 }

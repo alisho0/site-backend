@@ -40,6 +40,8 @@ public class Denuncia {
     @OneToMany(mappedBy = "denuncia", cascade = CascadeType.ALL)
     private List<DenunciaPersona> denunciaPersonas;
 
+    private Boolean notificar;
+
     @OneToOne
     @JoinColumn(name = "expediente_id", referencedColumnName = "id", nullable = true)
     private Expediente expediente;

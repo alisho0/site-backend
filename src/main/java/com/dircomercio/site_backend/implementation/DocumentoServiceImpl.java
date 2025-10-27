@@ -103,7 +103,7 @@ public class DocumentoServiceImpl implements DocumentoService {
             List<Documento> docs = documentoRepository.findAllByDenunciaId(denunciaId);
             List<DocumentoRespuestaDTO> dtos = new ArrayList<>();
             for (Documento doc : docs) {
-                dtos.add(new DocumentoRespuestaDTO(doc.getId(), doc.getNombre(), doc.getFormato()));
+                dtos.add(new DocumentoRespuestaDTO(doc.getId(), doc.getNombre(), doc.getFormato(), doc.getNombrevisible()));
             }
             return dtos;
         } catch (Exception e) {
