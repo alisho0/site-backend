@@ -30,6 +30,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PutMapping;
+
 
 
 
@@ -133,4 +135,13 @@ public class DocumentoController {
         }
     }
     
+    @PutMapping("/editarNombre/{id}")
+    public ResponseEntity<?> editarNombreDoc(@PathVariable Long id, @RequestBody String nombre) {
+        try {
+            DocumentoRespuestaDTO docNuevo = documentoService.cambiarNombreVisible(id, nombre);
+            return ResponseEntity.ok(docNuevo);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al editar el nombre");
+        }
+    }
 }
