@@ -22,4 +22,6 @@ public interface DocumentoService {
 
     List<OrdenRespuestaDTO> traerOrdenesPorExpediente(Long expedienteId) throws Exception;
     void crearOrden(List<MultipartFile> files, OrdenCreateDTO oDto) throws Exception;
+
+    DocumentoRespuestaDTO cambiarNombreVisible(Long id, String nuevoNombre) throws Exception;
 }

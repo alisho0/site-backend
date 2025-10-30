@@ -13,6 +13,7 @@ public class OrdenRespuestaDTO {
     private Long id;
     private Long id_pase;
     private TipoDocumento tipoDocumento;
+    private String nombreVisible;
     private String nroDocumento;
     private String referencia;
     private LocalDateTime fechaCreacion;
