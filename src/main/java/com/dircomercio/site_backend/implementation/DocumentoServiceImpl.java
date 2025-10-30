@@ -158,4 +158,23 @@ public class DocumentoServiceImpl implements DocumentoService {
             throw new Exception("Error al guardar documentos: " + e.getMessage());
         }
     }
+
+    @Override
+    public DocumentoRespuestaDTO cambiarNombreVisible(Long id, String nuevoNombre) throws Exception {
+        try {
+            Documento doc = documentoRepository.findById(id)
+                .orElseThrow(() -> new Exception("Error al encontrar el documento"));
+            doc.setNombrevisible(nuevoNombre);
+            documentoRepository.save(doc);
+            return DocumentoRespuestaDTO.builder()
+                .id(doc.getId())
+                .nombre(doc.getNombre())
+                .nombreVisible(doc.getNombrevisible())
+                .formato(doc.getFormato())
+                .build();
+        } catch (Exception e) {
+            throw new Exception("Error en la implementación de cambiar nombre al documento: " + e.getMessage());
+        }
+    }
+    
     }
