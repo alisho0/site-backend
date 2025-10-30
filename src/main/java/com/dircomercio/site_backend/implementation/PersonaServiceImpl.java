@@ -27,15 +27,11 @@ public class PersonaServiceImpl implements PersonaService {
         List<Persona> listaPersonas = new ArrayList<>();
         for (PersonaRolDTO personaRol : personas) {
             Persona persona = personaRol.getPersona();
-            if (persona != null) {
-                Persona existente = personaRepository.findByDocumento(persona.getDocumento()).orElse(null);
-                if (existente != null) {
-                    listaPersonas.add(existente);
-                } else {
-                    listaPersonas.add(personaRepository.save(persona));
-                }
+            Persona existente = personaRepository.findByDocumento(persona.getDocumento()).orElse(null);
+            if (existente != null) {
+                listaPersonas.add(existente);
             } else {
-                System.out.println("Persona nula encontrada, no se guardará en la base de datos.");
+                listaPersonas.add(personaRepository.save(persona));
             }
         }
 

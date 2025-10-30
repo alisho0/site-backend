@@ -62,7 +62,7 @@ public class SecurityConfig {
                     "/denuncia/traerDenunciaPorId/{id}",
                     "/denuncia/actualizarEstado/{id}",
                     "doc/traerPorDenuncia/{id}", "doc/traerPorId/{id}", "/usuarios/perfilUsuario", "/usuarios/actualizarNombre", "/usuarios/cambiarPassword", "/denuncia/traerDenunciasPorUsuario", "/denuncia/historial/{id}"
-                ).hasAnyRole("MESA_DE_ENTRADA", "ABOGADO", "ADMIN", "DIRECCION")
+                ).hasAnyRole("MESA_DE_ENTRADA", "ABOGADOS", "ADMIN", "DIRECCION")
 
                 // --- REGLAS ESPECÍFICAS PARA EL CRUD DE USUARIOS ---
                 .requestMatchers(HttpMethod.GET, "/usuarios/traerUsuarios").hasAnyRole("ADMIN", "DIRECCION")
@@ -71,7 +71,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.DELETE, "/usuarios/borrar/**").hasAnyRole("ADMIN", "DIRECCION") // Borrar
 
                 // Reglas para Expedientes, Pases, etc.
-                .requestMatchers("/expediente/traerPorUsuario", "/expediente/traerExpedientePorId/{id}", "/pases/**", "/pases/traerPasesPorExp/{id}", "/audiencias/**", "/doc/traerOrdenesPorExpediente/{expedienteId}", "/doc/eliminarDoc/{id}", "/doc/crearOrden").hasAnyRole("ADMIN", "ABOGADO", "DIRECCION")
+                .requestMatchers("/expediente/traerPorUsuario", "/expediente/traerExpedientePorId/{id}", "/pases/**", "/pases/traerPasesPorExp/{id}", "/audiencias/**", "/doc/traerOrdenesPorExpediente/{expedienteId}", "/doc/eliminarDoc/{id}", "/doc/crearOrden").hasAnyRole("ADMIN", "ABOGADOS", "DIRECCION")
                 
                 // Regla final: cualquier otra petición requiere ser ADMIN o DIRECCION
                 .anyRequest().hasAnyRole("DIRECCION", "ADMIN"))
