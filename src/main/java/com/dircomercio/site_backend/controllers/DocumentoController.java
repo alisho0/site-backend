@@ -4,6 +4,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.io.IOException; // <-- Import Nuevo
+
+import jakarta.servlet.http.HttpServletResponse; // <-- Import Nuevo
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,9 +34,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
-
-
-
 
 @RestController
 @NoArgsConstructor
@@ -101,28 +101,6 @@ public class DocumentoController {
         }
     }
     
-    // Endpoint para subir documentos a denuncia o pase existente
-    // @PostMapping("/subirArchivosExp")
-    // public ResponseEntity<?> subirDocumentos(
-    //         @RequestPart("info") String infoJson,
-    //         @RequestPart("file") List<MultipartFile> files) {
-    //     try {
-    //         ObjectMapper mapper = new ObjectMapper();
-    //         DocumentoCargaDTO dto = mapper.readValue(infoJson, DocumentoCargaDTO.class);
-    //         if (dto.getDenunciaId() != null) {
-    //             Denuncia denuncia = denunciaRepository.findById(dto.getDenunciaId())
-    //                     .orElseThrow(() -> new IllegalArgumentException("No se encontró la denuncia"));
-    //         }
-    //         if (dto.getPaseId() != null) {
-    //             Pase pase = paseRepository.findById(dto.getPaseId())
-    //                     .orElseThrow(() -> new IllegalArgumentException("No se encontró el pase"));
-    //         }
-    //         documentoService.guardarDocumentos(files, denuncia, pase, dto.getTipoDocumento());
-    //         return ResponseEntity.ok("Documentos subidos correctamente");
-    //     } catch (Exception e) {
-    //         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al subir documentos: " + e.getMessage());
-    //     }
-    // }
     @PostMapping("/crearOrden")
     public ResponseEntity<?> crearOrden(@RequestPart ("orden") String ordenInfoJson, @RequestPart("file") List<MultipartFile> files) {
         try {
@@ -142,6 +120,23 @@ public class DocumentoController {
             return ResponseEntity.ok(docNuevo);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al editar el nombre");
+        }
+    }
+
+    // 🚀 NUEVO ENDPOINT PARA DESCARGAR ZIP
+    @GetMapping("/descargarZip/{expedienteId}")
+    public void descargarZip(@PathVariable Long expedienteId, HttpServletResponse response) {
+        try {
+            // Llama al método del servicio que escribe directamente en el response
+            documentoService.descargarZipExpediente(expedienteId, response);
+        } catch (Exception e) {
+            // Si falla, intentamos devolver un error 500
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            try {
+                response.getWriter().write("Error al descargar ZIP: " + e.getMessage());
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 }
