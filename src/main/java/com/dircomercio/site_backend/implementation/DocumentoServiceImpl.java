@@ -1,14 +1,23 @@
 package com.dircomercio.site_backend.implementation;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.util.StreamUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +34,7 @@ import com.dircomercio.site_backend.entities.TipoDocumento;
 import com.dircomercio.site_backend.repositories.DocumentoRepository;
 import com.dircomercio.site_backend.repositories.ExpedienteRepository;
 import com.dircomercio.site_backend.services.DocumentoService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class DocumentoServiceImpl implements DocumentoService {
@@ -89,7 +99,9 @@ public class DocumentoServiceImpl implements DocumentoService {
                 }
                 documento.setFechaCreacion(LocalDateTime.now());
                 Files.write(path, bytes);
-                documentos.add(documento);
+                
+                // CORREGIDO: Era 'documento.add' -> debe ser 'documentos.add' (la lista)
+                documentos.add(documento); 
             }
             return (List<Documento>) documentoRepository.saveAll(documentos);
         } catch (Exception e) {
@@ -176,5 +188,62 @@ public class DocumentoServiceImpl implements DocumentoService {
             throw new Exception("Error en la implementación de cambiar nombre al documento: " + e.getMessage());
         }
     }
-    
+
+    // Implementación de la descarga ZIP
+    @Override
+    public void descargarZipExpediente(Long expedienteId, HttpServletResponse response) throws Exception {
+        // 1. Buscamos los documentos usando el método nuevo del Repo
+        List<Documento> documentos = documentoRepository.buscarPorExpedienteId(expedienteId);
+
+        if (documentos.isEmpty()) {
+            throw new Exception("No hay documentos para este expediente.");
+        }
+
+        // 2. Configuramos el Response
+        response.setContentType("application/zip");
+        response.setHeader("Content-Disposition", "attachment; filename=\"Expediente_" + expedienteId + "_Documentos.zip\"");
+        response.setStatus(HttpServletResponse.SC_OK);
+
+        // 3. Generamos el ZIP
+        try (ZipOutputStream zipOut = new ZipOutputStream(response.getOutputStream())) {
+            Set<String> nombresUsados = new HashSet<>();
+
+            for (Documento doc : documentos) {
+                // Validar que tenga ruta física
+                if (doc.getRuta() == null || doc.getRuta().isEmpty()) continue;
+
+                Path path = Paths.get(doc.getRuta());
+                if (!Files.exists(path)) continue; // Si el archivo no existe en disco, saltar
+
+                // Definir nombre del archivo dentro del ZIP
+                String nombreArchivo = (doc.getNombrevisible() != null && !doc.getNombrevisible().isEmpty()) 
+                                        ? doc.getNombrevisible() 
+                                        : doc.getNombre();
+                
+                // Asegurar extensión .pdf (si no la tiene ya)
+                if (!nombreArchivo.toLowerCase().endsWith(".pdf")) {
+                    nombreArchivo += ".pdf";
+                }
+
+                // Evitar nombres duplicados en el ZIP (agregar _ID si se repite)
+                if (nombresUsados.contains(nombreArchivo)) {
+                    nombreArchivo = nombreArchivo.replace(".pdf", "_" + doc.getId() + ".pdf");
+                }
+                nombresUsados.add(nombreArchivo);
+
+                // Crear entrada en el ZIP y copiar bytes
+                ZipEntry zipEntry = new ZipEntry(nombreArchivo);
+                zipEntry.setSize(Files.size(path));
+                zipOut.putNextEntry(zipEntry);
+
+                try (FileInputStream fis = new FileInputStream(path.toFile())) {
+                    StreamUtils.copy(fis, zipOut);
+                }
+                zipOut.closeEntry();
+            }
+            zipOut.finish();
+        } catch (IOException e) {
+            throw new Exception("Error al generar el archivo ZIP: " + e.getMessage());
+        }
     }
+}
