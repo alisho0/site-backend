@@ -2,6 +2,7 @@ package com.dircomercio.site_backend.auth.config;
 
 import java.util.List;
 
+import com.dircomercio.site_backend.auth.redis.RateLimitFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -33,6 +34,7 @@ public class SecurityConfig {
     private final AuthenticationProvider authenticationProvider;
     private final JwtAuthFilter jwtAuthFilter;
     private final TokenRepository tokenRepository;
+    private final RateLimitFilter rateLimitFilter;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -54,7 +56,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(req -> 
             req
                 // Endpoints públicos
-                .requestMatchers("/expediente/traerEstados/{nroExp}", "/auth/login", "/auth/register", "/auth/logout", "/auth/refresh", "/denuncia/subirDenuncia", "/rol/**").permitAll()
+                .requestMatchers("/expediente/traerEstados/{nroExp}", "/test", "/auth/login", "/auth/register", "/auth/logout", "/auth/refresh", "/denuncia/subirDenuncia", "/rol/**").permitAll()
                 
                 // Endpoints generales para usuarios logueados
                 .requestMatchers(
@@ -77,6 +79,7 @@ public class SecurityConfig {
                 .anyRequest().hasAnyRole("DIRECCION", "ADMIN"))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authenticationProvider(authenticationProvider)
+            .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
             .logout(logout ->
                 logout.logoutUrl("/auth/logout")
