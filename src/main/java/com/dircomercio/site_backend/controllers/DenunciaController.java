@@ -16,6 +16,8 @@ import com.dircomercio.site_backend.dtos.DenunciaRespuestaDTO;
 import com.dircomercio.site_backend.dtos.DenunciaUpdateDTO;
 import com.dircomercio.site_backend.services.DenunciaService;
 import com.dircomercio.site_backend.services.DocumentoService;
+import com.dircomercio.site_backend.services.AuditoriaService;
+import com.dircomercio.site_backend.utils.IpUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -25,7 +27,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.security.core.context.SecurityContextHolder;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 
 
 
@@ -41,7 +46,21 @@ public class DenunciaController {
     @Autowired
     DocumentoService documentoService;
 
-     @GetMapping("/historial/{id}")
+    @Autowired
+    private AuditoriaService auditoriaService;
+
+    private String obtenerUsuarioActual() {
+        try {
+            var authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.isAuthenticated()) {
+                return authentication.getName();
+            }
+        } catch (Exception e) {
+        }
+        return "ANONIMO";
+    }
+
+    @GetMapping("/historial/{id}")
     public ResponseEntity<?> getHistorialDenuncia(@PathVariable Long id) {
         try {
             List<DenunciaEstadoRespuestaDTO> historial = denunciaService.traerHistorialDenuncia(id);
@@ -51,22 +70,26 @@ public class DenunciaController {
         }
     }
 
+    // registrar auditoria en creacion
     @PostMapping("/subirDenuncia")
     public ResponseEntity<?> subirDenuncia(
             @RequestPart("denuncia") String denunciaJson,
-            @RequestPart("file") List<MultipartFile> files) throws JsonProcessingException {
+            @RequestPart("file") List<MultipartFile> files,
+            HttpServletRequest request) throws JsonProcessingException {
         try {
             ObjectMapper mapper = new ObjectMapper();
             DenunciaDTO denunciaDTO = mapper.readValue(denunciaJson, DenunciaDTO.class);
             denunciaService.guardarDenuncia(denunciaDTO, files);
-            // System.out.println("Denuncia: " + denunciaJson);
-            // System.out.println("Denuncia: " + denunciaDTO);
-            // System.out.println("Personas: " + denunciaDTO.getPersonas());
+            auditoriaService.registrarAccion(obtenerUsuarioActual(), "CREAR_DENUNCIA", 
+                "Denuncia creada con descripcion: " + denunciaDTO.getDescripcion(), IpUtil.obtenerIP(request), 
+                "SUCCESS", "Denuncia", null);
             return ResponseEntity.ok().body("La denuncia fue subida correctamente desde el controlador.");
         } catch (Exception e) {
             e.printStackTrace();
-            e.getMessage();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Algo salió mal en el controlador");
+            auditoriaService.registrarAccion(obtenerUsuarioActual(), "CREAR_DENUNCIA", 
+                "Error al crear denuncia: " + e.getMessage(), IpUtil.obtenerIP(request), 
+                "FAILURE", "Denuncia", null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Algo salio mal en el controlador");
         }
     }
 
@@ -97,19 +120,25 @@ public class DenunciaController {
             throw new RuntimeException("No se pudo traer las denuncias por usuario: " + e.getMessage());
         }
     }
-    
 
+    // registrar auditoria en cambio de estado
     @PutMapping("/actualizarEstado/{id}")
-    public ResponseEntity<?> actualizarEstado(@PathVariable Long id, @RequestBody DenunciaUpdateDTO dto) {
+    public ResponseEntity<?> actualizarEstado(@PathVariable Long id, @Valid @RequestBody DenunciaUpdateDTO dto, HttpServletRequest request) {
         try {
             denunciaService.actualizarEstadoDenuncia(id, dto);
+            auditoriaService.registrarAccion(obtenerUsuarioActual(), "ACTUALIZAR_DENUNCIA", 
+                "Estado de denuncia ID " + id + " actualizado a: " + dto.getEstado(), IpUtil.obtenerIP(request), 
+                "SUCCESS", "Denuncia", id);
             return ResponseEntity.ok().body("El estado de la denuncia fue actualizada correctamente.");
         } catch (Exception e) {
             e.printStackTrace();
+            auditoriaService.registrarAccion(obtenerUsuarioActual(), "ACTUALIZAR_DENUNCIA", 
+                "Error al actualizar denuncia ID " + id + ": " + e.getMessage(), IpUtil.obtenerIP(request), 
+                "FAILURE", "Denuncia", id);
             throw new RuntimeException("No se pudo actualizar el estado de la denuncia." + e.getMessage());
         }
     }
-    
+
     @PostMapping("/mandarCorreo/{id}")
     public ResponseEntity<?> mandarCorreo(@PathVariable Long id, @RequestBody String observacion) throws Exception {
         try {

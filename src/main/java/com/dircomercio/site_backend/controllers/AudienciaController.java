@@ -4,6 +4,9 @@ import com.dircomercio.site_backend.dtos.AudienciaCreateDTO;
 import com.dircomercio.site_backend.dtos.AudienciaDTO;
 import com.dircomercio.site_backend.entities.Audiencia;
 import com.dircomercio.site_backend.services.AudienciaService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +26,7 @@ public class AudienciaController {
     }
 
     @PostMapping("/creaAudiencia")
-    public ResponseEntity<AudienciaDTO> crearAudiencia(@RequestBody AudienciaCreateDTO dto) {
+    public ResponseEntity<AudienciaDTO> crearAudiencia(@Valid @RequestBody AudienciaCreateDTO dto) {
         Audiencia nueva = audienciaService.crearAudienciaDesdeDTO(dto);
         return ResponseEntity.ok(toDTO(nueva));
     }
@@ -42,7 +45,7 @@ public class AudienciaController {
     }
 
     @PutMapping("/actualizarAudiencia{id}")
-    public ResponseEntity<AudienciaDTO> actualizar(@PathVariable Long id, @RequestBody AudienciaCreateDTO dto) {
+    public ResponseEntity<AudienciaDTO> actualizar(@PathVariable Long id, @Valid @RequestBody AudienciaCreateDTO dto) {
         Audiencia actualizada = audienciaService.actualizarAudienciaDesdeDTO(id, dto);
         return ResponseEntity.ok(toDTO(actualizada));
     }
@@ -61,7 +64,7 @@ public class AudienciaController {
     }
 
     @PutMapping("/editarAudi/{id}")
-    public ResponseEntity<AudienciaDTO> editarAudiencia(@PathVariable Long id, @RequestBody AudienciaCreateDTO dto) {
+    public ResponseEntity<AudienciaDTO> editarAudiencia(@PathVariable Long id, @Valid @RequestBody AudienciaCreateDTO dto) {
         Audiencia actualizada = audienciaService.actualizarAudienciaDesdeDTO(id, dto);
         return ResponseEntity.ok(toDTO(actualizada));
     }

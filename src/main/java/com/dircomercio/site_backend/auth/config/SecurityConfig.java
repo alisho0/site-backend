@@ -1,8 +1,12 @@
+
 package com.dircomercio.site_backend.auth.config;
 
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.Environment;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -33,11 +37,35 @@ public class SecurityConfig {
     private final AuthenticationProvider authenticationProvider;
     private final JwtAuthFilter jwtAuthFilter;
     private final TokenRepository tokenRepository;
+    private final Environment environment; // inyecta el bean Environment
+
+    //nueva funcion que verifica el modo
+    private boolean isDevelopmentMode() {
+        String[] profiles = environment.getActiveProfiles();
+        return Arrays.asList(profiles).contains("development");
+    }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:8080", "100.83.50.21:8080", "http://100.83.50.21:8080", "https://homothetic-riotingly-leonora.ngrok-free.dev"));
+        
+        // se crea una lista dinamicamente de orígenes permitidos
+        List<String> allowedOrigins = new ArrayList<>();
+        
+        // estos son lo dominios oficiales (SIEMPRE activos en cualquier ambiente)
+        allowedOrigins.add("https://sde.gob.ar");
+        allowedOrigins.add("https://www.sde.gob.ar");
+        
+        // y estos lo dominios de desarrollo (SOLO cuando spring.profiles.active=development)
+        if (isDevelopmentMode()) {
+            allowedOrigins.add("http://localhost:5173");
+            allowedOrigins.add("http://localhost:5174");
+            allowedOrigins.add("100.83.50.21:8080");
+            allowedOrigins.add("http://100.83.50.21:8080");
+            allowedOrigins.add("https://homothetic-riotingly-leonora.ngrok-free.dev");
+        }
+        
+        configuration.setAllowedOrigins(allowedOrigins);
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

@@ -10,6 +10,8 @@ import com.dircomercio.site_backend.dtos.PaseRespuestaDTO;
 import com.dircomercio.site_backend.services.PaseService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.validation.Valid;
+
 import java.util.List;
 
 @RestController
@@ -71,7 +73,7 @@ public class PaseController {
     }
 
     @PutMapping("/editarPase/{id}")
-    public ResponseEntity<PaseRespuestaDTO> editarPase(@PathVariable Long id, @RequestBody PaseCreateDTO dto) {
+    public ResponseEntity<PaseRespuestaDTO> editarPase(@PathVariable Long id,@Valid @RequestBody PaseCreateDTO dto) {
         return ResponseEntity.ok(paseService.editarPase(id, dto));
     }
 }

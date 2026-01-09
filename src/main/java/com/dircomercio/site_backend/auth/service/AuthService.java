@@ -21,8 +21,13 @@ import com.dircomercio.site_backend.entities.Usuario;
 import com.dircomercio.site_backend.repositories.PersonaRepository;
 import com.dircomercio.site_backend.repositories.RolRepository;
 import com.dircomercio.site_backend.repositories.UsuarioRepository;
+import com.dircomercio.site_backend.services.AuditoriaService;
+import com.dircomercio.site_backend.utils.IpUtil;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +40,9 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final RolRepository rolRepository;
     private final PersonaRepository personaRepository;
+
+    @Autowired
+    private AuditoriaService auditoriaService;
 
     public TokenResponse register(RegisterRequest request) {
         Area area;
@@ -62,6 +70,8 @@ public class AuthService {
             String jwtToken = jwtService.generateToken(user);
             String refreshToken = jwtService.generateRefreshToken(user);
             saveUserToken(savedUser, jwtToken);
+            // AUDITORÍA: Pendiente - Se implementará junto con Rate Limiting
+            // auditoriaService.registrarAccion(..., "REGISTER_SUCCESS", ..., "SUCCESS", ...);
             return new TokenResponse(jwtToken, refreshToken);
         }
 
@@ -89,6 +99,8 @@ public class AuthService {
         String jwtToken = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
         saveUserToken(savedUser, jwtToken);
+        // AUDITORÍA: Pendiente - Se implementará junto con Rate Limiting
+        // auditoriaService.registrarAccion(..., "REGISTER_SUCCESS", ..., "SUCCESS", ...);
         return new TokenResponse(jwtToken, refreshToken);
     }
 
@@ -147,6 +159,8 @@ public class AuthService {
         String refreshToken = jwtService.generateRefreshToken(user);
         revokeAllUserTokens(user);
         saveUserToken(user, jwtToken);
+        // AUDITORÍA: Pendiente - Se implementará junto con Rate Limiting
+        // auditoriaService.registrarAccion(..., "LOGIN_SUCCESS", ..., "SUCCESS", ...);
         return new TokenResponse(jwtToken, refreshToken);
     }
 
@@ -173,5 +187,7 @@ public class AuthService {
         token.setRevoked(true);
         token.setExpired(true);
         tokenRepository.save(token);
+        // AUDITORÍA: Pendiente - Se implementará junto con Rate Limiting
+        // auditoriaService.registrarAccion(..., "LOGOUT", ..., "SUCCESS", ...);
     }
 }
