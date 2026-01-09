@@ -44,21 +44,24 @@ public class AuthService {
     @Autowired
     private AuditoriaService auditoriaService;
 
-    public TokenResponse register(RegisterRequest request) {
+    // registrar auditoria en registro
+    public TokenResponse register(RegisterRequest request, HttpServletRequest servletRequest) {
         Area area;
         try {
             area = Area.valueOf(request.rol().toUpperCase());
         } catch (Exception e) {
+            auditoriaService.registrarAccion(request.email(), "REGISTER_FAILED", "Rol invalido: " + request.rol(), 
+                IpUtil.obtenerIP(servletRequest), "FAILURE", "Usuario", null);
             throw new IllegalArgumentException("Rol no válido: " + request.rol());
         }
         if (usuarioRepository.existsByEmail(request.email())) {
+            auditoriaService.registrarAccion(request.email(), "REGISTER_FAILED", "Email ya en uso: " + request.email(), 
+                IpUtil.obtenerIP(servletRequest), "FAILURE", "Usuario", null);
             throw new IllegalArgumentException("El email ya está en uso: " + request.email());
         }
 
-        Persona personaExistente = personaRepository.findByDocumento(request.documento())
-            .orElse(null);
+        Persona personaExistente = personaRepository.findByDocumento(request.documento()).orElse(null);
         if (personaExistente != null) {
-            // Si la persona ya existe, la usamos
             Usuario user = Usuario.builder()
                 .nombre(request.name())
                 .email(request.email())
@@ -70,8 +73,8 @@ public class AuthService {
             String jwtToken = jwtService.generateToken(user);
             String refreshToken = jwtService.generateRefreshToken(user);
             saveUserToken(savedUser, jwtToken);
-            // AUDITORÍA: Pendiente - Se implementará junto con Rate Limiting
-            // auditoriaService.registrarAccion(..., "REGISTER_SUCCESS", ..., "SUCCESS", ...);
+            auditoriaService.registrarAccion(request.email(), "REGISTER_SUCCESS", "Usuario registrado: " + request.email(), 
+                IpUtil.obtenerIP(servletRequest), "SUCCESS", "Usuario", savedUser.getId());
             return new TokenResponse(jwtToken, refreshToken);
         }
 
@@ -99,8 +102,8 @@ public class AuthService {
         String jwtToken = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
         saveUserToken(savedUser, jwtToken);
-        // AUDITORÍA: Pendiente - Se implementará junto con Rate Limiting
-        // auditoriaService.registrarAccion(..., "REGISTER_SUCCESS", ..., "SUCCESS", ...);
+        auditoriaService.registrarAccion(request.email(), "REGISTER_SUCCESS", "Usuario registrado: " + request.email(), 
+            IpUtil.obtenerIP(servletRequest), "SUCCESS", "Usuario", savedUser.getId());
         return new TokenResponse(jwtToken, refreshToken);
     }
 
@@ -143,24 +146,33 @@ public class AuthService {
         return new TokenResponse(accessToken, refreshToken);
     }
 
-    public TokenResponse login(LoginRequest request) {
-        authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                request.email(), 
-                request.password()
-            )
-        );
+    // registrar auditoria en login
+    public TokenResponse login(LoginRequest request, HttpServletRequest servletRequest) {
+        try {
+            authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                    request.email(), 
+                    request.password()
+                )
+            );
+        } catch (Exception e) {
+            auditoriaService.registrarAccion(request.email(), "LOGIN_FAILED", "Credenciales invalidas", 
+                IpUtil.obtenerIP(servletRequest), "FAILURE", "Usuario", null);
+            throw e;
+        }
         Usuario user = usuarioRepository.findByEmail(request.email())
             .orElseThrow(() -> new UsernameNotFoundException("No encontrado el usuario"));
         if (user == null) {
+            auditoriaService.registrarAccion(request.email(), "LOGIN_FAILED", "Usuario no encontrado", 
+                IpUtil.obtenerIP(servletRequest), "FAILURE", "Usuario", null);
             throw new RuntimeException("Usuario no encontrado con email: " + request.email());
         }
         String jwtToken = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
         revokeAllUserTokens(user);
         saveUserToken(user, jwtToken);
-        // AUDITORÍA: Pendiente - Se implementará junto con Rate Limiting
-        // auditoriaService.registrarAccion(..., "LOGIN_SUCCESS", ..., "SUCCESS", ...);
+        auditoriaService.registrarAccion(request.email(), "LOGIN_SUCCESS", "Sesion iniciada: " + request.email(), 
+            IpUtil.obtenerIP(servletRequest), "SUCCESS", "Usuario", user.getId());
         return new TokenResponse(jwtToken, refreshToken);
     }
 
@@ -175,7 +187,8 @@ public class AuthService {
         }
     }
 
-    public void logout(String authHeader) {
+    // registrar auditoria en logout
+    public void logout(String authHeader, HttpServletRequest servletRequest) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             throw new IllegalArgumentException("Token no proporcionado o formato incorrecto");
         }
@@ -187,7 +200,7 @@ public class AuthService {
         token.setRevoked(true);
         token.setExpired(true);
         tokenRepository.save(token);
-        // AUDITORÍA: Pendiente - Se implementará junto con Rate Limiting
-        // auditoriaService.registrarAccion(..., "LOGOUT", ..., "SUCCESS", ...);
+        auditoriaService.registrarAccion(token.getUser().getEmail(), "LOGOUT_SUCCESS", "Sesion cerrada", 
+            IpUtil.obtenerIP(servletRequest), "SUCCESS", "Usuario", token.getUser().getId());
     }
 }

@@ -46,8 +46,8 @@ public class DenunciaServiceImpl implements DenunciaService {
     @Autowired
     DenunciaPersonaService dPersonaService;
 
-    @Autowired
-    EmailService emailService;
+    //@Autowired
+    //EmailService emailService;
     // agrego esto mostrar a ale, lo que hice aqui primero fue inyectar el servicio
     // de expediente
     @Autowired
