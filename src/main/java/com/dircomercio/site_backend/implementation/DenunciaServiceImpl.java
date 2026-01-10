@@ -3,6 +3,7 @@ package com.dircomercio.site_backend.implementation;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
@@ -61,7 +62,7 @@ public class DenunciaServiceImpl implements DenunciaService {
 
     @Override
     public void guardarDenuncia(DenunciaDTO denunciaDTO, List<MultipartFile> files) {
-
+        System.out.println(denunciaDTO);
         if (denunciaDTO == null)
             throw new IllegalArgumentException("La denuncia no puede ser nula.");
         if (files == null)
@@ -79,10 +80,13 @@ public class DenunciaServiceImpl implements DenunciaService {
             denunciaRepository.save(denuncia);
 
             // Aquí se crean (si es que no existen) y vinculan las personas a la denuncia
-            List<Persona> personasPersistidas = personaService.guardarPersonas(denunciaDTO.getPersonas());
+            List<PersonaRolDTO> personasValidas = denunciaDTO.getPersonas().stream()
+                .filter(p -> p.getPersona() != null)
+                .collect(Collectors.toList());
+            List<Persona> personasPersistidas = personaService.guardarPersonas(personasValidas);
             // 3. Mapear roles a personas persistidas
             List<PersonaRolDTO> personasRolPersistidas = new ArrayList<>();
-            for (int i = 0; i < denunciaDTO.getPersonas().size(); i++) {
+            for (int i = 0; i < personasValidas.size(); i++) {
                 PersonaRolDTO original = denunciaDTO.getPersonas().get(i);
                 Persona personaPersistida = personasPersistidas.get(i);
                 PersonaRolDTO dto = new PersonaRolDTO();

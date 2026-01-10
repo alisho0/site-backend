@@ -4,6 +4,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.io.IOException; // <-- Import Nuevo
+
+import jakarta.servlet.http.HttpServletResponse; // <-- Import Nuevo
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,11 +35,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import jakarta.servlet.http.HttpServletRequest;
-
-
 
 @RestController
 @NoArgsConstructor
@@ -125,7 +127,7 @@ public class DocumentoController {
             return ResponseEntity.status(500).body(null);
         }
     }
-
+    
     // registrar auditoria en creacion
     @PostMapping("/crearOrden")
     public ResponseEntity<?> crearOrden(@RequestPart("orden") String ordenInfoJson, @RequestPart("file") List<MultipartFile> files, HttpServletRequest request) {
@@ -142,7 +144,32 @@ public class DocumentoController {
                 "Error al crear orden: " + e.getMessage(), IpUtil.obtenerIP(request), 
                 "FAILURE", "Orden", null);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al crear la orden: " + e.getMessage());
+    }
+    
+    @PutMapping("/editarNombre/{id}")
+    public ResponseEntity<?> editarNombreDoc(@PathVariable Long id, @RequestBody String nombre) {
+        try {
+            DocumentoRespuestaDTO docNuevo = documentoService.cambiarNombreVisible(id, nombre);
+            return ResponseEntity.ok(docNuevo);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al editar el nombre");
         }
     }
 
+    // 🚀 NUEVO ENDPOINT PARA DESCARGAR ZIP
+    @GetMapping("/descargarZip/{expedienteId}")
+    public void descargarZip(@PathVariable Long expedienteId, HttpServletResponse response) {
+        try {
+            // Llama al método del servicio que escribe directamente en el response
+            documentoService.descargarZipExpediente(expedienteId, response);
+        } catch (Exception e) {
+            // Si falla, intentamos devolver un error 500
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            try {
+                response.getWriter().write("Error al descargar ZIP: " + e.getMessage());
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
 }
