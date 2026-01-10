@@ -127,12 +127,8 @@ public class DocumentoController {
             return ResponseEntity.status(500).body(null);
         }
     }
-<<<<<<< HEAD
-
-    // registrar auditoria en creacion
-=======
     
->>>>>>> main
+    // registrar auditoria en creacion
     @PostMapping("/crearOrden")
     public ResponseEntity<?> crearOrden(@RequestPart("orden") String ordenInfoJson, @RequestPart("file") List<MultipartFile> files, HttpServletRequest request) {
         try {
