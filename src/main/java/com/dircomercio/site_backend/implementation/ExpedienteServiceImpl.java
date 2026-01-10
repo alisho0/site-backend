@@ -284,4 +284,25 @@ public class ExpedienteServiceImpl implements ExpedienteService {
         boolean esAdmin = usuario.getRol() != null && usuario.getRol().name().equalsIgnoreCase("ADMIN");
         return expediente != null && (esAdmin || expediente.getUsuarios().contains(usuario));
     }
-}
+
+    // Métodos alias para compatibilidad con el controller
+    @Override
+    public Expediente crear(ExpedienteCreateDTO dto) {
+        return crearExpedienteDesdeDTO(dto);
+    }
+
+    @Override
+    public Expediente obtenerPorId(Long id) {
+        return expedienteRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Expediente no encontrado con ID: " + id));
+    }
+
+    @Override
+    public Expediente actualizar(Long id, ExpedienteUpdateDTO dto) {
+        return actualizarExpediente(id, dto);
+    }
+
+    @Override
+    public void eliminar(Long id) {
+        eliminarExpediente(id);
+    }}
