@@ -13,6 +13,8 @@ import com.dircomercio.site_backend.entities.Pase;
 
 import com.dircomercio.site_backend.entities.TipoDocumento;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 public interface DocumentoService {
 
     List<Documento> guardarDocumentos(List<MultipartFile> files, Denuncia denuncia, Pase pase) throws Exception;
@@ -22,4 +24,7 @@ public interface DocumentoService {
 
     List<OrdenRespuestaDTO> traerOrdenesPorExpediente(Long expedienteId) throws Exception;
     void crearOrden(List<MultipartFile> files, OrdenCreateDTO oDto) throws Exception;
+
+    DocumentoRespuestaDTO cambiarNombreVisible(Long id, String nuevoNombre) throws Exception;
+    public void descargarZipExpediente(Long expedienteId, HttpServletResponse response) throws Exception;
 }

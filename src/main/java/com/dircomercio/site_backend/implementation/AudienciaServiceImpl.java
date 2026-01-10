@@ -13,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AudienciaServiceImpl implements AudienciaService {
@@ -118,6 +120,11 @@ public class AudienciaServiceImpl implements AudienciaService {
 
     @Override
     public List<Audiencia> traerAudienciasPorExpediente(Long expedienteId) {
-        return audienciaRepository.findByExpediente_Id(expedienteId);
+        List<Audiencia> audiencias = audienciaRepository.findByExpediente_Id(expedienteId);
+        List<Audiencia> ordenadas = audiencias.stream()
+            .sorted(Comparator.comparing(Audiencia::getFecha).reversed())
+            .collect(Collectors.toList());
+        return ordenadas;
+
     }
 }
