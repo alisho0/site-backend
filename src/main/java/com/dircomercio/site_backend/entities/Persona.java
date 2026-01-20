@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,8 +38,8 @@ public class Persona {
     private String documento;
     private String domicilio;
 
-    // @OneToOne(mappedBy = "persona")
-    // private Usuario usuario;
+    @OneToOne(mappedBy = "persona")
+    private Usuario usuario;
 
     @OneToMany(mappedBy = "persona", cascade = CascadeType.ALL)
     private List<DenunciaPersona> denunciaPersonas;

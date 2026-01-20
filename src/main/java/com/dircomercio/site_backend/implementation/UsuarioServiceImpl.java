@@ -65,8 +65,12 @@ public class UsuarioServiceImpl {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
         
         Persona persona = usuario.getPersona();
+        
+        // CORRECCIÓN: Si es null, instanciamos una nueva y la vinculamos
         if (persona == null) {
-            throw new RuntimeException("La persona asociada al usuario no existe");
+            persona = new Persona();
+            persona.setUsuario(usuario);
+            usuario.setPersona(persona);
         }
 
         usuario.setNombre(perfilDTO.getName());
@@ -95,8 +99,12 @@ public class UsuarioServiceImpl {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         
         Persona persona = usuario.getPersona();
+        
+        // CORRECCIÓN: Si es null, instanciamos una nueva y la vinculamos
         if (persona == null) {
-            throw new RuntimeException("La persona asociada al usuario no existe");
+            persona = new Persona();
+            persona.setUsuario(usuario);
+            usuario.setPersona(persona);
         }
 
         usuario.setNombre(perfilDTO.getName());
@@ -111,7 +119,6 @@ public class UsuarioServiceImpl {
         usuarioRepository.save(usuario);
         personaRepository.save(persona);
     }
-
     // --- MÉTODO CORREGIDO ---
     public PerfilDTO obtenerPerfil() throws Exception {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();

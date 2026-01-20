@@ -41,7 +41,7 @@ public class Usuario {
     @OneToMany(mappedBy = "user" ,cascade = CascadeType.ALL, orphanRemoval = true, fetch =  FetchType.LAZY)
     private List<Token> tokens;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_persona", referencedColumnName = "id")
     private Persona persona;
 
