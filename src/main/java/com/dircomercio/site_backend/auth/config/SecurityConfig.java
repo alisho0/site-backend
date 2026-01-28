@@ -87,6 +87,9 @@ public class SecurityConfig {
                         // ✅ IMPORTANTE: permitir preflight CORS (OPTIONS) para todas las rutas
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
+                        // ✅ Permitir /error para ver errores reales
+                        .requestMatchers("/error").permitAll()
+
                         // Endpoints públicos
                         .requestMatchers(
                                 "/expediente/traerEstados/{nroExp}",
@@ -138,6 +141,20 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            System.err.println("[SECURITY ERROR] " + authException.getMessage());
+                            response.setStatus(401);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\": \"" + authException.getMessage() + "\"}");
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            System.err.println("[ACCESS DENIED] " + accessDeniedException.getMessage());
+                            response.setStatus(403);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\": \"" + accessDeniedException.getMessage() + "\"}");
+                        })
+                )
                 .logout(logout -> logout.logoutUrl("/auth/logout")
                         .addLogoutHandler((request, response, authentication) -> {
                             final var authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);

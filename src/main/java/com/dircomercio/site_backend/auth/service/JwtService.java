@@ -37,9 +37,14 @@ public class JwtService {
 
     // Aquí construye el token, para registrar y loguear, lo usan los dos
     private String buildToken(final Usuario user, final long expiration) {
+        // Crear map con valores seguros (nunca null)
+        Map<String, Object> claims = new java.util.HashMap<>();
+        String nombre = user.getNombre() != null ? user.getNombre() : user.getEmail();
+        claims.put("name", nombre);
+        
         return Jwts.builder()
             .id(user.getId().toString())
-            .claims(Map.of("name", user.getNombre()))
+            .claims(claims)
             .subject(user.getEmail())
             .claim("rol", user.getRol() != null ? user.getRol().name() : "USER")
             .issuedAt(new Date(System.currentTimeMillis()))
