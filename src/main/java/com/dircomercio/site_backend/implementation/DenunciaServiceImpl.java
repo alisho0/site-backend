@@ -47,8 +47,8 @@ public class DenunciaServiceImpl implements DenunciaService {
     @Autowired
     DenunciaPersonaService dPersonaService;
 
-    //@Autowired
-    //EmailService emailService;
+    // @Autowired
+    // EmailService emailService;
     // agrego esto mostrar a ale, lo que hice aqui primero fue inyectar el servicio
     // de expediente
     @Autowired
@@ -81,8 +81,8 @@ public class DenunciaServiceImpl implements DenunciaService {
 
             // Aquí se crean (si es que no existen) y vinculan las personas a la denuncia
             List<PersonaRolDTO> personasValidas = denunciaDTO.getPersonas().stream()
-                .filter(p -> p.getPersona() != null)
-                .collect(Collectors.toList());
+                    .filter(p -> p.getPersona() != null)
+                    .collect(Collectors.toList());
             List<Persona> personasPersistidas = personaService.guardarPersonas(personasValidas);
             // 3. Mapear roles a personas persistidas
             List<PersonaRolDTO> personasRolPersistidas = new ArrayList<>();
@@ -276,10 +276,23 @@ public class DenunciaServiceImpl implements DenunciaService {
     @Override
     public List<DenunciaRespuestaDTO> traerDenunciasPorUsuario() throws Exception {
         try {
-            String email = SecurityContextHolder.getContext().getAuthentication().getName();
+            var auth = SecurityContextHolder.getContext().getAuthentication();
+            String email = auth.getName();
+            boolean isAdminOrLawyer = auth.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") ||
+                            a.getAuthority().equals("ROLE_DIRECCION") ||
+                            a.getAuthority().equals("ROLE_MESA_DE_ENTRADA") ||
+                            a.getAuthority().equals("ROLE_ABOGADOS"));
+
+            if (isAdminOrLawyer) {
+                // Para roles internos, devolvemos todas las denuncias en formato DTO
+                return traerDenuncias();
+            }
+
             List<Expediente> expediente = expedienteRepository.findByUsuarios_Email(email);
             if (expediente.isEmpty()) {
-                throw new Exception("No se encontraron expedientes para el usuario con email: " + email);
+                // Retornar lista vacía en lugar de error para usuarios normales sin denuncias
+                return new ArrayList<>();
             }
             List<DenunciaRespuestaDTO> denunciasResp = new ArrayList<>();
             for (Expediente exp : expediente) {

@@ -10,21 +10,27 @@ public class IpUtil {
      */
 
     public static String obtenerIP(HttpServletRequest request) {
-        // navegadores/proxies envian ip en este header
-        String ip = request.getHeader("X-Forwarded-For");
+        String[] headers = {
+                "X-Forwarded-For",
+                "Proxy-Client-IP",
+                "WL-Proxy-Client-IP",
+                "HTTP_X_FORWARDED_FOR",
+                "HTTP_X_FORWARDED",
+                "HTTP_X_CLUSTER_CLIENT_IP",
+                "HTTP_CLIENT_IP",
+                "HTTP_FORWARDED_FOR",
+                "HTTP_FORWARDED",
+                "HTTP_VIA",
+                "REMOTE_ADDR"
+        };
 
-        if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip)) {
-            // si hay varias ip toma la primera
-            return ip.split(",")[0];
+        for (String header : headers) {
+            String ip = request.getHeader(header);
+            if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip)) {
+                return ip.split(",")[0].trim();
+            }
         }
 
-        // sino, se intenta en este header
-        ip = request.getHeader("X-Real-IP");
-        if (ip != null && !ip.isEmpty() && !"unknown".equalsIgnoreCase(ip)) {
-            return ip;
-        }
-
-        // si no se encuentra en headers, se usa la ip directa del cliente
         return request.getRemoteAddr();
     }
 }

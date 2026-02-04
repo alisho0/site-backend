@@ -58,9 +58,9 @@ public class ExpedienteServiceImpl implements ExpedienteService {
         Expediente expediente = new Expediente();
         expediente.setNroExp(dto.getNroExp());
         expediente.setCant_folios(dto.getCantFolios());
-        //expediente.setFecha_inicio(dto.getFechaInicio());
-        //expediente.setFecha_finalizacion(dto.getFechaFinalizacion());
-        //expediente.setHipervulnerable(dto.getHipervulnerable());
+        // expediente.setFecha_inicio(dto.getFechaInicio());
+        // expediente.setFecha_finalizacion(dto.getFechaFinalizacion());
+        // expediente.setHipervulnerable(dto.getHipervulnerable());
         expediente.setDelegacion(dto.getDelegacion());
         expediente.setDenuncia(denuncia);
 
@@ -72,7 +72,7 @@ public class ExpedienteServiceImpl implements ExpedienteService {
     public Expediente crearExpedienteDesdeMinimalDTO(ExpedienteCreateMinimalDTO dto) {
         Expediente expediente = new Expediente();
 
-        expediente.setNroExp(dto.getNro_exp()); // 
+        expediente.setNroExp(dto.getNro_exp()); //
         expediente.setCant_folios(null); // Se completará más adelante
         expediente.setFecha_inicio(null);
         expediente.setFecha_finalizacion(null);
@@ -93,7 +93,7 @@ public class ExpedienteServiceImpl implements ExpedienteService {
 
         Denuncia denuncia = denunciaOpt.get();
         // if (!"EN PROCESO".equalsIgnoreCase(denuncia.getEstado())) {
-        //     throw new IllegalArgumentException("La denuncia no está aceptada");
+        // throw new IllegalArgumentException("La denuncia no está aceptada");
         // }
         String añoActual = String.valueOf(LocalDate.now().getYear());
         String prefijo = "EXP" + "-" + añoActual + "-" + "DGC" + "-";
@@ -109,7 +109,7 @@ public class ExpedienteServiceImpl implements ExpedienteService {
         }
         String nroExpediente = prefijo + siguienteNumero;
         Expediente expediente = new Expediente();
-        
+
         expediente.setFecha_inicio(LocalDate.now());
         expediente.setNroExp(nroExpediente);
         expediente.setCant_folios("0");
@@ -128,14 +128,13 @@ public class ExpedienteServiceImpl implements ExpedienteService {
     public ExpedienteIdRespuestaDTO traerExpedientePorId(Long id) {
         try {
             Expediente expediente = expedienteRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Expediente no encontrado con ID: " + id));
+                    .orElseThrow(() -> new IllegalArgumentException("Expediente no encontrado con ID: " + id));
             Denuncia denuncia = denunciaRepository.findById(expediente.getDenuncia().getId()).orElseThrow();
             ExpedienteIdRespuestaDTO respuestaDto = new ExpedienteIdRespuestaDTO();
             List<UsuarioDTO> usuariosDtos = new ArrayList<>();
             DenunciaRespuestaDTO dto = new DenunciaRespuestaDTO();
             Long id_denuncia = denuncia.getId();
 
-            
             dto.setId(denuncia.getId());
             dto.setDescripcion(denuncia.getDescripcion());
             dto.setEstado(denuncia.getEstado());
@@ -143,14 +142,14 @@ public class ExpedienteServiceImpl implements ExpedienteService {
             dto.setObjeto(denuncia.getObjeto());
             for (Usuario usu : expediente.getUsuarios()) {
                 UsuarioDTO usuarioDTO = UsuarioDTO.builder()
-                    .email(usu.getEmail())
-                    .nombreUsuario(usu.getNombre())
-                    .id(usu.getId())
-                    .build();
+                        .email(usu.getEmail())
+                        .nombreUsuario(usu.getNombre())
+                        .id(usu.getId())
+                        .build();
                 usuariosDtos.add(usuarioDTO);
             }
             respuestaDto.setUsuRespuesta(usuariosDtos);
-            
+
             List<PersonaConRolDTO> personas = new ArrayList<>();
             for (DenunciaPersona dp : denuncia.getDenunciaPersonas()) {
                 PersonaConRolDTO p = new PersonaConRolDTO();
@@ -170,7 +169,7 @@ public class ExpedienteServiceImpl implements ExpedienteService {
                 personas.add(p);
             }
             dto.setPersonas(personas);
-        
+
             respuestaDto.setCant_folios(expediente.getCant_folios());
             respuestaDto.setDelegacion(expediente.getDelegacion());
             respuestaDto.setFecha_finalizacion(expediente.getFecha_finalizacion());
@@ -178,14 +177,15 @@ public class ExpedienteServiceImpl implements ExpedienteService {
             respuestaDto.setHipervulnerable(expediente.getHipervulnerable());
             respuestaDto.setId(expediente.getId());
             respuestaDto.setNro_exp(expediente.getNroExp());
-            respuestaDto.setDenuncia(dto);   
+            respuestaDto.setDenuncia(dto);
             respuestaDto.setId_denuncia(id_denuncia);
             return respuestaDto;
         } catch (Exception e) {
             throw new IllegalArgumentException("Error al traer el expediente: " + e.getMessage());
         }
-        //respuestaDto.setDenuncia(expediente.getDenuncia() != null ? expediente.getDenuncia().toRespuestaDTO() : null);
-        
+        // respuestaDto.setDenuncia(expediente.getDenuncia() != null ?
+        // expediente.getDenuncia().toRespuestaDTO() : null);
+
     }
 
     @Override
@@ -203,13 +203,13 @@ public class ExpedienteServiceImpl implements ExpedienteService {
             dto.setNro_exp(e.getNroExp());
             List<UsuarioDTO> usuariosDtos = new ArrayList<>();
             for (Usuario usu : e.getUsuarios()) {
-                    UsuarioDTO usuDto = UsuarioDTO.builder()
+                UsuarioDTO usuDto = UsuarioDTO.builder()
                         .email(usu.getEmail())
                         .nombreUsuario(usu.getNombre())
                         .rol(usu.getEmail())
                         .id(usu.getId())
                         .build();
-                    usuariosDtos.add(usuDto);
+                usuariosDtos.add(usuDto);
             }
             dto.setUsuRespuesta(usuariosDtos);
             respuesta.add(dto);
@@ -218,10 +218,21 @@ public class ExpedienteServiceImpl implements ExpedienteService {
     }
 
     // Método que trae expediente según el usuario
-    public List<ExpedienteRespuestaDTO> listarExpedientesPorUsuario() throws Exception { // creo que ni hace falta el id, solo sacar el token
-        try {  
-            String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            List<Expediente> expedientes = expedienteRepository.findByUsuarios_Email(email); // Busca expedientes asociados al usuario
+    public List<ExpedienteRespuestaDTO> listarExpedientesPorUsuario() throws Exception {
+        try {
+            var auth = SecurityContextHolder.getContext().getAuthentication();
+            String email = auth.getName();
+            boolean isAdminOrLawyer = auth.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") ||
+                            a.getAuthority().equals("ROLE_DIRECCION") ||
+                            a.getAuthority().equals("ROLE_ABOGADOS"));
+
+            List<Expediente> expedientes;
+            if (isAdminOrLawyer) {
+                expedientes = (List<Expediente>) expedienteRepository.findAll();
+            } else {
+                expedientes = expedienteRepository.findByUsuarios_Email(email);
+            }
             List<ExpedienteRespuestaDTO> respuesta = new ArrayList<>();
             for (Expediente e : expedientes) {
                 ExpedienteRespuestaDTO dto = new ExpedienteRespuestaDTO();
@@ -235,19 +246,18 @@ public class ExpedienteServiceImpl implements ExpedienteService {
                 List<UsuarioDTO> usuariosDtos = new ArrayList<>();
                 for (Usuario usu : e.getUsuarios()) {
                     UsuarioDTO usuDto = UsuarioDTO.builder()
-                        .email(usu.getEmail())
-                        .nombreUsuario(usu.getNombre())
-                        .rol(usu.getEmail())
-                        .id(usu.getId())
-                        .build();
+                            .email(usu.getEmail())
+                            .nombreUsuario(usu.getNombre())
+                            .rol(usu.getEmail())
+                            .id(usu.getId())
+                            .build();
                     usuariosDtos.add(usuDto);
                 }
                 dto.setUsuRespuesta(usuariosDtos);
                 respuesta.add(dto);
             }
             return respuesta;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new Exception("Error al obtener los expedientes en Impl: " + e.getMessage());
         }
     }
@@ -260,12 +270,12 @@ public class ExpedienteServiceImpl implements ExpedienteService {
             expediente.setHipervulnerable(dto.getHipervulnerable());
             expediente.setDelegacion(dto.getDelegacion());
 
-        // Buscar usuarios por ID
+            // Buscar usuarios por ID
             List<Usuario> usuarios = (List<Usuario>) usuarioRepository.findAllById(dto.getUsuarios());
             expediente.setUsuarios(usuarios);
 
             return expedienteRepository.save(expediente);
-    }).orElseThrow(() -> new IllegalArgumentException("Expediente no encontrado con ID: " + id));
+        }).orElseThrow(() -> new IllegalArgumentException("Expediente no encontrado con ID: " + id));
     }
 
     @Override
@@ -279,7 +289,8 @@ public class ExpedienteServiceImpl implements ExpedienteService {
     // Permite a PreAuthorize verificar si el usuario puede acceder a un expediente
     public boolean usuarioPuedeAcceder(Long expedienteId) {
         var usuario = authUtil.getUsuarioAutenticado();
-        if (usuario == null) return false;
+        if (usuario == null)
+            return false;
         var expediente = expedienteRepository.findById(expedienteId).orElse(null);
         boolean esAdmin = usuario.getRol() != null && usuario.getRol().name().equalsIgnoreCase("ADMIN");
         return expediente != null && (esAdmin || expediente.getUsuarios().contains(usuario));
@@ -294,7 +305,7 @@ public class ExpedienteServiceImpl implements ExpedienteService {
     @Override
     public Expediente obtenerPorId(Long id) {
         return expedienteRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Expediente no encontrado con ID: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Expediente no encontrado con ID: " + id));
     }
 
     @Override
@@ -305,4 +316,5 @@ public class ExpedienteServiceImpl implements ExpedienteService {
     @Override
     public void eliminar(Long id) {
         eliminarExpediente(id);
-    }}
+    }
+}

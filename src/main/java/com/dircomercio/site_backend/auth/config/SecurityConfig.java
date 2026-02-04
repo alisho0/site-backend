@@ -1,4 +1,3 @@
-
 package com.dircomercio.site_backend.auth.config;
 
 import java.util.List;
@@ -50,29 +49,26 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-
-        // se crea una lista dinamicamente de orígenes permitidos
         List<String> allowedOrigins = new ArrayList<>();
 
-        // estos son lo dominios oficiales (SIEMPRE activos en cualquier ambiente)
+        // --- DOMINIOS OFICIALES ---
         allowedOrigins.add("https://sde.gob.ar");
         allowedOrigins.add("https://www.sde.gob.ar");
 
-        // y estos lo dominios de desarrollo (SOLO cuando
-        // spring.profiles.active=development)
-        if (isDevelopmentMode()) {
-            allowedOrigins.add("http://localhost:5173");
-            allowedOrigins.add("http://localhost:5174");
-            allowedOrigins.add("100.83.50.21:8080");
-            allowedOrigins.add("http://100.83.50.21:8080");
-            allowedOrigins.add("https://homothetic-riotingly-leonora.ngrok-free.dev");
-        }
+        // --- DOMINIOS DE DESARROLLO (Siempre activos para pruebas) ---
+        allowedOrigins.add("http://localhost:5173");
+        allowedOrigins.add("http://localhost:5174");
+        allowedOrigins.add("http://localhost:8080");
+        allowedOrigins.add("http://100.83.50.21:8080");
+        allowedOrigins.add("https://homothetic-riotingly-leonora.ngrok-free.dev");
 
         configuration.setAllowedOrigins(allowedOrigins);
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
-        configuration.setExposedHeaders(List.of("Authorization"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin",
+                "Access-Control-Request-Method", "Access-Control-Request-Headers"));
+        configuration.setExposedHeaders(List.of("Authorization", "Content-Disposition"));
         configuration.setAllowCredentials(true);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
@@ -84,7 +80,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req -> req
-                        // ✅ IMPORTANTE: permitir preflight CORS (OPTIONS) para todas las rutas
+                        // ✅ Permitir preflight CORS (OPTIONS)
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                         // Endpoints públicos
@@ -99,13 +95,17 @@ public class SecurityConfig {
                                 "/rol/**")
                         .permitAll()
 
-                        // Endpoints generales para usuarios logueados
+                        // ✅ PERMISOS DE AUDITORÍA (Logs) - ¡Agregado aquí!
+                        // Permite acceso a /auditoria y /logs a ADMIN y DIRECCION
+                        .requestMatchers("/api/auditoria/**", "/logs/**").hasAnyRole("ADMIN", "DIRECCION")
+
+                        // Endpoints generales
                         .requestMatchers(
                                 "/denuncia/traerDenuncia",
                                 "/denuncia/traerDenunciaPorId/{id}",
                                 "/denuncia/actualizarEstado/{id}",
-                                "doc/traerPorDenuncia/{id}",
-                                "doc/traerPorId/{id}",
+                                "/doc/traerPorDenuncia/{id}",
+                                "/doc/traerPorId/{id}",
                                 "/usuarios/perfilUsuario",
                                 "/usuarios/actualizarNombre",
                                 "/usuarios/cambiarPassword",
@@ -113,17 +113,18 @@ public class SecurityConfig {
                                 "/denuncia/historial/{id}")
                         .hasAnyRole("MESA_DE_ENTRADA", "ABOGADOS", "ADMIN", "DIRECCION")
 
-                        // --- REGLAS ESPECÍFICAS PARA EL CRUD DE USUARIOS ---
+                        // CRUD de Usuarios
                         .requestMatchers(HttpMethod.GET, "/usuarios/traerUsuarios").hasAnyRole("ADMIN", "DIRECCION")
-                        .requestMatchers(HttpMethod.GET, "/usuarios/{id}").hasAnyRole("ADMIN", "DIRECCION") // Ver
-                                                                                                            // detalles
-                        .requestMatchers(HttpMethod.PUT, "/usuarios/{id}").hasAnyRole("ADMIN", "DIRECCION") // Editar
-                        .requestMatchers(HttpMethod.DELETE, "/usuarios/borrar/**").hasAnyRole("ADMIN", "DIRECCION") // Borrar
+                        .requestMatchers(HttpMethod.GET, "/usuarios/{id}").hasAnyRole("ADMIN", "DIRECCION")
+                        .requestMatchers(HttpMethod.PUT, "/usuarios/{id}").hasAnyRole("ADMIN", "DIRECCION")
+                        .requestMatchers(HttpMethod.DELETE, "/usuarios/borrar/**").hasAnyRole("ADMIN", "DIRECCION")
 
-                        // Reglas para Expedientes, Pases, etc.
+                        // Expedientes y Pases
                         .requestMatchers(
                                 "/expediente/traerPorUsuario",
                                 "/expediente/traerExpedientePorId/{id}",
+                                "/expediente/{id}",
+                                "/expediente/traerExpedientes",
                                 "/pases/**",
                                 "/pases/traerPasesPorExp/{id}",
                                 "/audiencias/**",
@@ -132,7 +133,7 @@ public class SecurityConfig {
                                 "/doc/crearOrden")
                         .hasAnyRole("ADMIN", "ABOGADOS", "DIRECCION")
 
-                        // Regla final: cualquier otra petición requiere ser ADMIN o DIRECCION
+                        // Cualquier otra petición requiere rol alto
                         .anyRequest().hasAnyRole("DIRECCION", "ADMIN"))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
@@ -151,7 +152,7 @@ public class SecurityConfig {
 
     private void logout(final String token) {
         if (token == null || !token.startsWith("Bearer ")) {
-            return; // No hacer nada si no hay token
+            return;
         }
         final String jwtToken = token.substring(7);
         final Token foundToken = tokenRepository.findByToken(jwtToken);

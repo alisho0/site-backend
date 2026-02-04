@@ -5,4 +5,5 @@ public enum Area {
     ABOGADOS,
     DIRECCION,
     ASESORIA_LEGAL,
+    ADMIN,
 }

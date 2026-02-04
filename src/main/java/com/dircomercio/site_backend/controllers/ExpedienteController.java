@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -62,13 +63,22 @@ public class ExpedienteController {
 
     // Obtener expediente por ID
     // @PreAuthorize("@expedienteServiceImpl.usuarioPuedeAcceder(#id)")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DIRECCION', 'ABOGADOS')")
     @GetMapping("/traerExpedientePorId/{id}")
     public ResponseEntity<ExpedienteIdRespuestaDTO> obtenerExpedientePorId(@PathVariable Long id) {
         ExpedienteIdRespuestaDTO expediente = expedienteService.traerExpedientePorId(id);
         return ResponseEntity.ok().body(expediente);
     }
 
+    // Endpoint RESTful para compatibilidad con frontend
+    @PreAuthorize("hasAnyRole('ADMIN', 'DIRECCION', 'ABOGADOS')")
+    @GetMapping("/{id}")
+    public ResponseEntity<ExpedienteIdRespuestaDTO> obtenerExpedientePorIdRest(@PathVariable Long id) {
+        return obtenerExpedientePorId(id);
+    }
+
     // Listar todos los expedientes
+    @PreAuthorize("hasAnyRole('ADMIN', 'DIRECCION', 'ABOGADOS')")
     @GetMapping("/traerExpedientes")
     public ResponseEntity<?> listarExpedientes() {
         return ResponseEntity.ok(expedienteService.listarExpedientes());
@@ -88,6 +98,7 @@ public class ExpedienteController {
         return ResponseEntity.ok(obtenerExpedientePorId(id));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'DIRECCION', 'ABOGADOS')")
     @GetMapping("/traerEstados/{nroExp}")
     public ResponseEntity<?> traerPorExp(@PathVariable String nroExp) {
         List<DenunciaEstado> historial = denunciaEstadoRepository.findByDenuncia_Expediente_NroExp(nroExp);
@@ -103,6 +114,7 @@ public class ExpedienteController {
         return ResponseEntity.ok(respuesta);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'DIRECCION', 'ABOGADOS')")
     @GetMapping("/traerPorUsuario")
     public ResponseEntity<?> traerPorUsuario() {
         try {
@@ -119,14 +131,14 @@ public class ExpedienteController {
     public ResponseEntity<?> crearExpediente(@Valid @RequestBody ExpedienteCreateDTO dto, HttpServletRequest request) {
         try {
             Expediente expediente = expedienteService.crear(dto);
-            auditoriaService.registrarAccion(obtenerUsuarioActual(), "CREATE_EXPEDIENTE", 
-                "Creo expediente numero: " + expediente.getNroExp(), IpUtil.obtenerIP(request), 
-                "SUCCESS", "EXPEDIENTE", expediente.getId());
+            auditoriaService.registrarAccion(obtenerUsuarioActual(), "CREATE_EXPEDIENTE",
+                    "Creo expediente numero: " + expediente.getNroExp(), IpUtil.obtenerIP(request),
+                    "SUCCESS", "EXPEDIENTE", expediente.getId());
             return ResponseEntity.ok(expediente);
         } catch (Exception e) {
-            auditoriaService.registrarAccion(obtenerUsuarioActual(), "CREATE_EXPEDIENTE", 
-                "Error al crear expediente: " + e.getMessage(), IpUtil.obtenerIP(request), 
-                "FAILURE", "EXPEDIENTE", null);
+            auditoriaService.registrarAccion(obtenerUsuarioActual(), "CREATE_EXPEDIENTE",
+                    "Error al crear expediente: " + e.getMessage(), IpUtil.obtenerIP(request),
+                    "FAILURE", "EXPEDIENTE", null);
             throw e;
         }
     }
@@ -144,17 +156,18 @@ public class ExpedienteController {
 
     // registrar auditoria en actualizacion
     @PutMapping("/{id}")
-    public ResponseEntity<?> actualizar(@PathVariable Long id, @Valid @RequestBody ExpedienteUpdateDTO dto, HttpServletRequest request) {
+    public ResponseEntity<?> actualizar(@PathVariable Long id, @Valid @RequestBody ExpedienteUpdateDTO dto,
+            HttpServletRequest request) {
         try {
             Expediente expediente = expedienteService.actualizar(id, dto);
-            auditoriaService.registrarAccion(obtenerUsuarioActual(), "UPDATE_EXPEDIENTE", 
-                "Actualizo expediente numero: " + expediente.getNroExp(), IpUtil.obtenerIP(request), 
-                "SUCCESS", "EXPEDIENTE", id);
+            auditoriaService.registrarAccion(obtenerUsuarioActual(), "UPDATE_EXPEDIENTE",
+                    "Actualizo expediente numero: " + expediente.getNroExp(), IpUtil.obtenerIP(request),
+                    "SUCCESS", "EXPEDIENTE", id);
             return ResponseEntity.ok(expediente);
         } catch (Exception e) {
-            auditoriaService.registrarAccion(obtenerUsuarioActual(), "UPDATE_EXPEDIENTE", 
-                "Error al actualizar: " + e.getMessage(), IpUtil.obtenerIP(request), 
-                "FAILURE", "EXPEDIENTE", id);
+            auditoriaService.registrarAccion(obtenerUsuarioActual(), "UPDATE_EXPEDIENTE",
+                    "Error al actualizar: " + e.getMessage(), IpUtil.obtenerIP(request),
+                    "FAILURE", "EXPEDIENTE", id);
             throw e;
         }
     }
@@ -165,14 +178,14 @@ public class ExpedienteController {
         try {
             Expediente expediente = expedienteService.obtenerPorId(id);
             expedienteService.eliminar(id);
-            auditoriaService.registrarAccion(obtenerUsuarioActual(), "DELETE_EXPEDIENTE", 
-                "Elimino expediente numero: " + expediente.getNroExp(), IpUtil.obtenerIP(request), 
-                "SUCCESS", "EXPEDIENTE", id);
+            auditoriaService.registrarAccion(obtenerUsuarioActual(), "DELETE_EXPEDIENTE",
+                    "Elimino expediente numero: " + expediente.getNroExp(), IpUtil.obtenerIP(request),
+                    "SUCCESS", "EXPEDIENTE", id);
             return ResponseEntity.ok("Expediente eliminado");
         } catch (Exception e) {
-            auditoriaService.registrarAccion(obtenerUsuarioActual(), "DELETE_EXPEDIENTE", 
-                "Error al eliminar: " + e.getMessage(), IpUtil.obtenerIP(request), 
-                "FAILURE", "EXPEDIENTE", id);
+            auditoriaService.registrarAccion(obtenerUsuarioActual(), "DELETE_EXPEDIENTE",
+                    "Error al eliminar: " + e.getMessage(), IpUtil.obtenerIP(request),
+                    "FAILURE", "EXPEDIENTE", id);
             throw e;
         }
     }
